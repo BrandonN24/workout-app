@@ -47,7 +47,7 @@ app.post('/api/login', async (req, res, next) =>
   const { login, password } = req.body;
 
   const db = client.db("WorkoutApp");
-  const results = await db.collection('Users').find({Login:login,Password:password}).toArray();
+  const results = await db.collection('userInfo').find({login:login,password:password}).toArray();
 
   var id = -1;
   var fn = '';
