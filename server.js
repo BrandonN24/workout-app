@@ -45,6 +45,15 @@ app.post('/api/login', async (req, res, next) =>
  var error = '';
 
   const { login, password } = req.body;
+	
+  if(login == null)
+  {
+    error = "Username required";
+  }
+  else if(password == null)
+  {
+    error = "Password requierd";
+  }
 
   const db = client.db("LargeProject");
   const results = await db.collection('userInfo').find({login:login,password:password}).toArray();
@@ -60,7 +69,7 @@ app.post('/api/login', async (req, res, next) =>
     ln = results[0].LastName;
   }
 
-  var ret = { id:id, firstName:fn, lastName:ln, error:''};
+  var ret = { id:id, firstName:fn, lastName:ln, error:error};
   res.status(200).json(ret);
 });
 
