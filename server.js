@@ -42,37 +42,61 @@ app.post('/api/login', async (req, res, next) =>
   // incoming: login, password
   // outgoing: id, firstName, lastName, error
 	
- var error = '';
+  var error = '';
 
   const { login, password } = req.body;
-	
-  if(login == null)
-  {
-    error = "Username required";
-  }
-  else if(password == null)
-  {
-    error = "Password requierd";
-  }
 
+  // Establish connection to database and await info from it.
   const db = client.db("LargeProject");
   const results = await db.collection('userInfo').find({login:login,password:password}).toArray();
 
-  var id = -1;
-  var fn = '';
-  var ln = '';
+  let id = -1;
+  let n = ''; // fill this with name from db.
+  let email = '';
+  let age = '';
+  let height = '';
+  let weight = '';
 
   if( results.length > 0 )
   {
-    id = results[0].UserID;
-    fn = results[0].FirstName;
-    ln = results[0].LastName;
+    id = results[0]._id;  // case-sensitive to _id field on userInfo document
+    n = results[0].name;  // case-senstive to name field on userInfo document
+    email = results[0].email; // case-senstive to email field on userInfo document
+    age = results[0].age; // case-senstive to age field on userInfo document
+    height = results[0].height; // case-senstive to height field on userInfo document
+    weight = results[0].weight; // case-senstive to weight field on userInfo document
   }
 
-  var ret = { id:id, firstName:fn, lastName:ln, error:error};
+  // return json object containing user info
+  var ret = {id: id, name:n, email: email, age: age, height: height, weight: weight, error:error};
   res.status(200).json(ret);
 });
 
+app.post('/api/register', async (req, res, next) => 
+{
+  // incoming: name, login, password, email
+  // outgoing: error
+	
+  var error = '';
+
+  const { login, password, name, email } = req.body;
+
+  // create newUser object
+  // age, height, and weight are left blank for a different api to fill later.
+  const newUser = {login: login, password: password, name: name, email: email, age: null, height: null, weight: null};
+
+  try{
+    const db = client.db("LargeProject");
+    const results = await db.collection('userInfo').insertOne(newUser);
+  }
+  catch(e){
+    // set error message to error from DB if that point fails.
+    error = e.toString()
+  }
+
+  var ret = {error:error};
+  res.status(200).json(ret);  // return with HTML code 200 and error message json
+});
 
 ///////////////////////////////////////////////////
 // For Heroku deployment
