@@ -73,30 +73,6 @@ app.post('/api/login', async (req, res, next) =>
   res.status(200).json(ret);
 });
 
-app.post('/api/register', async (req, res, next) => 
-{
-  // incoming: name, login, password, email
-  // outgoing: error
-	
-  var error = '';
-
-  const { name, login, password, email } = req.body;
-
-  const newUser = {name: name, login: login, password: password, email: email};
-
-  // creating reference to database
-  try{
-    const db = client.db("LargeProject");
-    const results = await db.collection('userInfo').insertOne(newUser);
-  }
-  catch(e){
-    error = e.toString();
-  }
-
-  var ret = { error: error};
-  res.status(200).json(ret);    // return HTML status code 200
-});
-
 
 ///////////////////////////////////////////////////
 // For Heroku deployment
