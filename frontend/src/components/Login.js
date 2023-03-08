@@ -2,18 +2,6 @@ import React, {useState} from 'react';
 
 function Login()
 {
-    const app_name = 'workout-app-cop4331'
-    function buildPath(route)
-    {
-        if (process.env.NODE_ENV === 'production') 
-        {
-            return 'https://' + app_name +  '.herokuapp.com/' + route;
-        }
-        else
-        {        
-            return 'http://localhost:5000/' + route;
-        }
-    }  
 
     var loginName;
     var loginPassword;
@@ -29,7 +17,8 @@ function Login()
 
         try
         {    
-            const response = await fetch(buildPath('api/login'),
+            var bp = require('./Path.js');
+            const response = await fetch(bp.buildPath('api/login'),
                 {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
 
             var res = JSON.parse(await response.text());
