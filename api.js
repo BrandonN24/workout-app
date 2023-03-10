@@ -62,8 +62,8 @@ exports.setApp = function (app, client){
     const { login, password, name, email } = req.body;
 
     // create newUser object
-    // age, height, and weight are left blank for a different api to fill later.
-    const newUser = {login: login, password: password, name: name, email: email, age: null, height: null, weight: null};
+    // age, height, weight, and hasExercises are left blank for a different api to fill later.
+    const newUser = {login: login, password: password, name: name, email: email, age: null, height: null, weight: null, hasExercises: null};
 
     try{
         const db = client.db("LargeProject");
