@@ -20,7 +20,7 @@ exports.setApp = function (app, client){
     app.post('/api/login', async (req, res, next) => 
     {
     // incoming: login, password
-    // outgoing: id, firstName, lastName, error
+    // outgoing: id, name, error
         
     var error = '';
 
