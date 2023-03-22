@@ -62,7 +62,7 @@ exports.setApp = function (app, client){
     const { login, password, name, email } = req.body;
 
     // create newUser object
-    // age, height, weight, and hasExercises are left blank for a different api to fill later.
+    // age, height, weight, and hasExercises are left blank for the addUserInfo api to fill later.
     const newUser = {login: login, password: password, name: name, email: email, age: null, height: null, weight: null, hasExercises: null};
 
     try{
@@ -78,4 +78,30 @@ exports.setApp = function (app, client){
     res.status(200).json(ret);  // return with HTML code 200 and error message json
     });
     
+    
+    // When the user first logs into their account they are prompted to input their age, weight, and height.
+	app.post('/api/addUserInfo', async (req, res, next) => 
+    {
+		// incoming: age, weight, height, login (to search for the user in the database)
+		// outgoing: none
+		
+		var error = '';
+
+		const { age, weight, height } = req.body;
+		
+		// Connect to the database and get the user object.
+		const db = client.db("LargeProject");
+		const results = await db.collection('userInfo').find({login:login}).toArray(); // Password is not needed as the user has already logged in
+		
+		if( results.length > 0 )
+		{
+			results[0].age = age; // case-senstive to age field on userInfo document
+			results[0].height = height; // case-senstive to height field on userInfo document
+			results[0].weight = weight; // case-senstive to weight field on userInfo document
+		}
+		else
+		{
+			error = 'user not found';
+		}
+	}
 }
