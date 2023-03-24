@@ -20,7 +20,7 @@ exports.setApp = function (app, client){
     app.post('/api/login', async (req, res, next) => 
     {
     // incoming: login, password
-    // outgoing: id, firstName, lastName, error
+    // outgoing: id, name, error
         
     var error = '';
 
@@ -63,7 +63,7 @@ exports.setApp = function (app, client){
 
     // create newUser object
     // age, height, weight, and hasExercises are left blank for a different api to fill later.
-    const newUser = {login: login, password: password, name: name, email: email, age: null, height: null, weight: null, hasExercises: null};
+    const newUser = {login: login, password: password, name: name, email: email, age: null, height: null, weight: null, hasExercises: null, validated: false};
 
     try{
         const db = client.db("LargeProject");

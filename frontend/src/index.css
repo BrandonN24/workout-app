@@ -1,10 +1,74 @@
 body {
-  margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-image: url("./components/images/background.jpg");
+  margin: 0 auto 100px;
+  background-size: cover;
+  background-repeat: no-repeat;
+  overflow-x:hidden;
+  padding-top: 40px;
+}
+
+#title{
+  padding:25px;
+  margin: 0 auto;
+  text-align: center;
+  justify-content: flex-start;
+  width: 300px;
+  background-color: rgb(90, 138, 195,.9);
+  border-radius: 20px;
+}
+
+#loginDiv{
+  padding:25px;
+  margin: 0 auto;
+  text-align: center;
+  justify-content: flex-start;
+  width: 300px;
+  background-color: rgb(90, 138, 195,.9);
+  border-radius: 20px;
+}
+
+#registerDiv{
+  padding:25px;
+  margin: 0 auto;
+  text-align: center;
+  justify-content: flex-start;
+  width: 300px;
+  background-color: rgb(90, 138, 195,.9);
+  border-radius: 20px;
+}
+
+#inner-title{
+  padding: 12px;
+}
+
+input,
+input[type="text"],
+input[type="password"],
+textarea {
+  position: relative;
+  margin: 5px;
+  border: 1px solid #000000;
+  border-radius: 5px;
+  outline: none;
+  background: #eeeeee;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+#loginButton:hover {
+  background: #718398;
+  color: #000000;
+  cursor:pointer;
+}
+
+#registerButton:hover {
+  background: #718398;
+  color: #000000;
+  cursor:pointer;
 }
 
 code {

@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import {Link} from 'react-router-dom';
 
 function Login()
 {
@@ -29,7 +30,7 @@ function Login()
             }
             else
             {
-                var user = {firstName:res.firstName,lastName:res.lastName,id:res.id}
+                var user = {name:res.name,id:res.id}
                 localStorage.setItem('user_data', JSON.stringify(user));
 
                 setMessage('');
@@ -54,7 +55,18 @@ function Login()
         <input type="submit" id="loginButton" class="buttons" value = "Do It"
           onClick={doLogin} />
         </form>
-        <span id="loginResult">{message}</span>
+        <span id="loginResult">{message}</span><br />
+     
+        <span className = "link register">
+            <span style={{fontSize:15}}>
+                No account? Register
+            </span>
+            <Link to='/RegisterPage'>
+            <span style={{fontSize:15}}>
+                &nbsp;here.
+            </span>
+            </Link>
+        </span>
      </div>
     );
 };
