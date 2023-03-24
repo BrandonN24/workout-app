@@ -15,7 +15,7 @@ app.use(bodyParser.json());
 require('dotenv').config();
 const url = process.env.MONGODB_URI;
 const MongoClient = require('mongodb').MongoClient;
-const client = new MongoClient(url);
+const client = new MongoClient('mongodb+srv://WorkoutTeam:WeGoJim247@workoutapp.3vpw95s.mongodb.net/?retryWrites=true&w=majority');
 client.connect();
 
 var api = require('./api.js');

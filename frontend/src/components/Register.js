@@ -76,7 +76,7 @@ function Register()
     return (
         <div id="registerDiv">
             <form onSubmit={doRegister}>
-            <span id="inner-title">PLEASE Register</span><br />
+            <span id="inner-title">PLEASE REGISTER</span><br />
             <input type="text" id="registerName" placeholder="Name" ref={(c) => registerName = c} /><br />
             <input type="text" id="registerEmail" placeholder="Email" ref={(c) => registerEmail = c} /><br />
             <input type="text" id="registerLogin" placeholder="Username" ref={(c) => registerLogin = c} /><br />

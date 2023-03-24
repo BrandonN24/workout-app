@@ -55,7 +55,7 @@ function Login()
         <input type="submit" id="loginButton" class="buttons" value = "Do It"
           onClick={doLogin} />
         </form>
-        <span id="loginResult">{message}</span>
+        <span id="loginResult">{message}</span><br />
      
         <span className = "link register">
             <span style={{fontSize:15}}>
