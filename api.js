@@ -63,7 +63,7 @@ exports.setApp = function (app, client){
 
     // create newUser object
     // age, height, weight, and hasExercises are left blank for the addUserInfo api to fill later.
-    const newUser = {login: login, password: password, name: name, email: email, age: null, height: null, weight: null, hasExercises: null};
+    const newUser = {login: login, password: password, name: name, email: email, age: null, height: null, weight: null, hasExercises: null, validated: false};
 
     try{
         const db = client.db("LargeProject");
@@ -103,5 +103,5 @@ exports.setApp = function (app, client){
 		{
 			error = 'user not found';
 		}
-	}
+	});
 }
