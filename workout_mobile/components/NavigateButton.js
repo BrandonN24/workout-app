@@ -2,15 +2,10 @@ import {Pressable, StyleSheet, Text, View, Dimensions} from 'react-native';
 import React from 'react';
 import {useFormik, useFormikContext} from 'formik';
 
-const SubmitButton = ({title}) => {
-  const {handleSubmit, isSubmitting} = useFormikContext();
+const NavigateButton = ({title, onPress}) => {
+  const {} = useFormikContext();
   return (
-    <Pressable
-      onPress={isSubmitting ? null : handleSubmit}
-      style={[
-        styles.submit,
-        {backgroundColor: isSubmitting ? 'gray' : '#8469cf'},
-      ]}>
+    <Pressable onPress={onPress} style={styles.submit}>
       <Text style={styles.btnText}>{title}</Text>
     </Pressable>
   );
@@ -21,6 +16,7 @@ const styles = StyleSheet.create({
   submit: {
     width: width - 40,
     height: 50,
+    backgroundColor: '#8469cf',
     borderRadius: 8,
     marginBottom: 20,
     justifyContent: 'center',
@@ -31,4 +27,4 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
 });
-export default SubmitButton;
+export default NavigateButton;
