@@ -17,6 +17,7 @@ exports.setApp = function (app, client){
     next();
     });
 
+    // Login API
     app.post('/api/login', async (req, res, next) => 
     {
     // incoming: login, password
@@ -52,6 +53,11 @@ exports.setApp = function (app, client){
     res.status(200).json(ret);
     });
 
+    // *******************
+    // END OF LOGIN API
+    // *******************
+
+    // Register API
     app.post('/api/register', async (req, res, next) => 
     {
     // incoming: name, login, password, email
@@ -78,7 +84,11 @@ exports.setApp = function (app, client){
     res.status(200).json(ret);  // return with HTML code 200 and error message json
     });
     
+    // *******************
+    // END OF REGISTER API
+    // *******************
     
+    // addUserInfo API
     // When the user first logs into their account they are prompted to input their age, weight, and height.
 	app.post('/api/addUserInfo', async (req, res, next) => 
     {
@@ -87,21 +97,34 @@ exports.setApp = function (app, client){
 		
 		var error = '';
 
-		const { age, weight, height } = req.body;
+		const { login, age, weight, height } = req.body;
 		
 		// Connect to the database and get the user object.
 		const db = client.db("LargeProject");
-		const results = await db.collection('userInfo').find({login:login}).toArray(); // Password is not needed as the user has already logged in
-		
-		if( results.length > 0 )
-		{
-			results[0].age = age; // case-senstive to age field on userInfo document
-			results[0].height = height; // case-senstive to height field on userInfo document
-			results[0].weight = weight; // case-senstive to weight field on userInfo document
-		}
-		else
-		{
-			error = 'user not found';
-		}
+
+        // Try to find and update a user given a login field and 
+        // update with the given age, height, and weight parameters.
+        try{
+            result = await db.collection('userInfo').updateOne(
+                {"login" : login},  
+                {$set: {
+                    "age" : age, "height": height, "weight" : weight
+                }}
+            );
+        }
+        catch(e){
+            error = e.toString();
+            // return error code 400, bad request.
+            res.status(400).json({error: error});
+        }
+
+        // if we didn't find a login matching the one inputted,
+        // then reflect that in the error message.
+        if(result.matchedCount == 0){
+            error = "User not found";
+        }
+
+        var ret = {error:error};
+        res.status(200).json(ret);
 	});
 }
