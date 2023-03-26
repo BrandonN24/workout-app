@@ -9,9 +9,11 @@ import {Formik} from 'formik';
 import * as yup from 'yup';
 import CustomFormik from '../CustomFormik';
 import NavigateButton from '../NavigateButton';
+import axios from 'axios';
+import client from '../../api/client';
 
 const initialValues = {
-  userName: '',
+  login: '',
   name: '',
   email: '',
   password: '',
@@ -19,7 +21,7 @@ const initialValues = {
 };
 
 const validationSchema = yup.object({
-  userName: yup.string().trim().required('Username is missing!'),
+  login: yup.string().trim().required('Username is missing!'),
   name: yup.string().trim().required('Name is missing!'),
   email: yup.string().email('Invalid email!').required('Email is missing!'),
   password: yup
@@ -35,20 +37,24 @@ const Register = () => {
     navigation.navigate('Login');
   };
 
-  const handleRegister = (values, formikActions) => {
-    setTimeout(() => {
-      console.log(values, formikActions);
+  const handleRegister = async (values, formikActions) => {
+    try {
+      const {data} = await client.post('/api/register', {...values});
+      console.log(data);
       formikActions.resetForm();
       formikActions.setSubmitting(false);
-    }, 3000);
+    } catch (error) {
+      console.log(error?.response?.data);
+    }
   };
+
   return (
     <FormContainer>
       <CustomFormik
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={handleRegister}>
-        <AppInput name="userName" placeholder="Username" />
+        <AppInput name="login" placeholder="Username" />
         <AppInput name="name" placeholder="Name" />
         <AppInput name="email" placeholder="Email" />
         <AppInput secureTextEntry name="password" placeholder="Password" />

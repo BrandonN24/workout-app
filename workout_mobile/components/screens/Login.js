@@ -7,15 +7,23 @@ import {useNavigation} from '@react-navigation/native';
 import CustomFormik from '../CustomFormik';
 import * as yup from 'yup';
 import NavigateButton from '../NavigateButton';
+import client from '../../api/client';
 
 const Login = () => {
   const initialValues = {
-    userName: '',
+    login: '',
     password: '',
   };
 
+  const navigation = useNavigation();
+  const navigateToRegister = () => {
+    navigation.navigate('Register');
+  };
+  const navigateToHome = () => {
+    navigation.navigate('Home');
+  };
   const validationSchema = yup.object({
-    userName: yup.string().trim().required('Username is missing!'),
+    login: yup.string().trim().required('Username is missing!'),
     password: yup
       .string()
       .trim()
@@ -23,17 +31,16 @@ const Login = () => {
       .required('Password is missing!'),
   });
 
-  const handleLogin = (values, formikActions) => {
-    setTimeout(() => {
-      console.log(values, formikActions);
+  const handleLogin = async (values, formikActions) => {
+    try {
+      const {data} = await client.post('/api/login', {...values});
+      console.log(data);
+      navigateToHome();
       formikActions.resetForm();
       formikActions.setSubmitting(false);
-    }, 3000);
-  };
-
-  const navigation = useNavigation();
-  const navigateToRegister = () => {
-    navigation.navigate('Register');
+    } catch (error) {
+      console.log(error?.response?.data);
+    }
   };
 
   return (
@@ -42,7 +49,7 @@ const Login = () => {
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={handleLogin}>
-        <AppInput name="userName" placeholder="Username" />
+        <AppInput name="login" placeholder="Username" />
         <AppInput secureTextEntry name="password" placeholder="Password" />
         <SubmitButton title="Log In" />
         <NavigateButton onPress={navigateToRegister} title="Register" />
