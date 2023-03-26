@@ -69,7 +69,17 @@ exports.setApp = function (app, client){
 
     // create newUser object
     // age, height, weight, and hasExercises are left blank for the addUserInfo api to fill later.
-    const newUser = {login: login, password: password, name: name, email: email, age: null, height: null, weight: null, hasExercises: null, validated: false};
+    const newUser = {
+        login: login, 
+        password: password, 
+        name: name, 
+        email: email, 
+        age: null, 
+        height: null, 
+        weight: null, 
+        hasExercises: null, 
+        validated: false
+    };
 
     try{
         const db = client.db("LargeProject");
@@ -93,7 +103,7 @@ exports.setApp = function (app, client){
 	app.post('/api/addUserInfo', async (req, res, next) => 
     {
 		// incoming: age, weight, height, login (to search for the user in the database)
-		// outgoing: none
+		// outgoing: error message
 		
 		var error = '';
 
@@ -127,4 +137,36 @@ exports.setApp = function (app, client){
         var ret = {error:error};
         res.status(200).json(ret);
 	});
+
+    // **********************
+    // End of addUserInfo API
+    // **********************
+
+    app.post('/api/createWorkoutTemplate', async (req, res, next) => 
+    {
+		// incoming: age, weight, height, login (to search for the user in the database)
+		// outgoing: error message
+		
+		var error = '';
+
+		const { login, age, weight, height } = req.body;
+		
+		// Connect to the database and get the user object.
+		const db = client.db("LargeProject");
+
+        // Try to find and update a user given a login field and 
+        // update with the given age, height, and weight parameters.
+        try{
+            const result = await db.collection('workoutInfo').insertOne();
+        }
+        catch(e){
+            error = e.toString();
+            // return error code 400, bad request.
+            res.status(400).json({error: error});
+        }
+
+        var ret = {error:error};
+        res.status(200).json(ret);
+	});
+
 }
