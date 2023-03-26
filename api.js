@@ -151,6 +151,10 @@ exports.setApp = function (app, client){
 
 		const { login, age, weight, height } = req.body;
 		
+        const newWorkout = {
+            
+        };
+
 		// Connect to the database and get the user object.
 		const db = client.db("LargeProject");
 
