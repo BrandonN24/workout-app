@@ -13,12 +13,16 @@ function AddInfo()
     {
         event.preventDefault();
 
+        addAge = parseFloat(addAge);
+        addHeight = parseFloat(addHeight);
+        addWeight = parseFloat(addWeight);    
+
         var temp = 
         {
             login:userID.login,
-            age:addAge.value,
-            height:addHeight.value,
-            weight:addWeight.value
+            age:addAge,
+            height:addHeight,
+            weight:addWeight
         };
 
         var js = JSON.stringify(temp);
@@ -30,7 +34,7 @@ function AddInfo()
                 {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
 
             var res = JSON.parse(await response.text());
-
+            
             if( res.error !== '')
             {
                 setMessage(res.error);
@@ -38,7 +42,7 @@ function AddInfo()
             }
             else
             {
-                var user = {age:res.age,height:res.height,weight:res.weight}
+                var user = {login:res.login,age:res.age,height:res.height,weight:res.weight}
                 localStorage.setItem('user_data', JSON.stringify(user));
 
                 setMessage('Info Added');
