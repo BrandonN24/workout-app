@@ -1,6 +1,17 @@
 import React, {useState} from 'react';
 import {Link} from 'react-router-dom';
 
+let cookieName = "";
+let cookieID = [];
+
+function saveCookie()
+{
+    let minutes = 20;
+    let date = new Date();
+    date.setTime(date.getTime()+(minutes*60*1000));
+    document.cookie = "name=" + cookieName + ",userID=" + cookieID + ";expires=" + date.toGMTString();
+}
+
 function Login()
 {
 
@@ -34,7 +45,16 @@ function Login()
                 localStorage.setItem('user_data', JSON.stringify(user));
 
                 setMessage('');
-                window.location.href = '/HomePage';
+                cookieName = res.name;
+                cookieID = res.id;
+                saveCookie();
+                if(res.age == null)
+                {
+                    window.location.href = '/AddInfoPage';    
+                }
+                else{
+                    window.location.href = '/HomePage';
+                }    
             }
         }
         catch(e)
