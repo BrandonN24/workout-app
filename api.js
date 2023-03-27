@@ -171,6 +171,23 @@ exports.setApp = function (app, client){
 
         var ret = {error:error};
         res.status(200).json(ret);
-	});
+    });
+
+    // ********************************
+    // End of createWorkoutTemplate API
+    // ********************************
+	
+    app.post('/api/getExercises', async (req, res, next) => 
+    {
+	// incoming: none
+	// outgoing: an array containing the user's exercises
+	var error = '';
+	const db = client.db("LargeProject");
+	// return all results but exclude the fields that aren't the exercises array
+        const results = await db.collection('workoutInfo').find({},{_id:0},{name:0},{date:0},{duration:0},{calories_burned:0}).toArray();
+		
+	var ret = {error:error};
+        res.status(200).json(ret);
+    }
 
 }
