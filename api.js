@@ -189,5 +189,27 @@ exports.setApp = function (app, client){
 	var ret = {error:error};
         res.status(200).json(ret);
     }
-
+	     
+    // ***********************
+    // End of getExercises API
+    // ***********************
+	
+    app.post('/api/deleteWorkoutTemplate', async (req, res, next) => 
+    {
+	// incoming: workout id
+	// outgoing: nothing?
+		
+	const { id } = req.body;
+	var error = '';
+		
+	const db = client.db("LargeProject");
+        await db.collection('workoutInfo').deleteOne({_id:id});
+		
+	var ret = {error:error};
+        res.status(200).json(ret);
+    }
+	
+    // ********************************
+    // End of deleteWorkoutTemplate API
+    // ********************************	     
 }
