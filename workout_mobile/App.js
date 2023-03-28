@@ -1,13 +1,16 @@
-import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
-import React from 'react'
+import {DefaultTheme, NavigationContainer} from '@react-navigation/native';
+import React from 'react';
 import AuthNavigation from './navigation/AuthNavigation';
 
-const theme = {...DefaultTheme, colors: {...DefaultTheme.colors, background:'#fff'}}
+const theme = {
+  ...DefaultTheme,
+  colors: {...DefaultTheme.colors, background: '#fff'},
+};
 
 const App = () => {
-  return( 
+  return (
     <NavigationContainer theme={theme}>
-      <AuthNavigation/>
+      <AuthNavigation />
     </NavigationContainer>
   );
 };

@@ -1,5 +1,5 @@
 import {StyleSheet, Text, View} from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import FormContainer from '../FormContainer';
 import AppInput from '../AppInput';
 import SubmitButton from '../SubmitButton';
@@ -34,8 +34,10 @@ const Login = () => {
   const handleLogin = async (values, formikActions) => {
     try {
       const {data} = await client.post('/api/login', {...values});
-      console.log(data);
-      navigateToHome();
+      console.log(data.id);
+      if (data.id != -1) {
+        navigateToHome();
+      }
       formikActions.resetForm();
       formikActions.setSubmitting(false);
     } catch (error) {
