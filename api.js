@@ -47,7 +47,7 @@ exports.setApp = function (app, client){
         }
 
         // return json object containing user info
-        var ret = {id: id, name:n, email: email, age: age, height: height, weight: weight, error:error};
+        var ret = {id: id, login: login, name:n, email: email, age: age, height: height, weight: weight, error:error};
         res.status(200).json(ret);
     });
 
