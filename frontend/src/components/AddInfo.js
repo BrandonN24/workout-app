@@ -4,25 +4,25 @@ function AddInfo()
 {
     const [message, setMessage] = useState('');
 
-    var userID = JSON.parse(localStorage.getItem("user_data"));
+    const userID = JSON.parse(localStorage.getItem("user_data"));
+
     var addAge;
     var addHeight;
     var addWeight;
 
     const doAddInfo = async event =>
     {
-        event.preventDefault();
-
-        addAge = parseFloat(addAge);
-        addHeight = parseFloat(addHeight);
-        addWeight = parseFloat(addWeight);    
+        event.preventDefault();   
+        const ageVal = parseInt(addAge.value);
+        const heightVal = parseInt(addHeight.value);
+        const weightVal = parseInt(addWeight.value);
 
         var temp = 
         {
             login:userID.login,
-            age:addAge,
-            height:addHeight,
-            weight:addWeight
+            age:ageVal,
+            height:heightVal,
+            weight:weightVal
         };
 
         var js = JSON.stringify(temp);
@@ -42,9 +42,9 @@ function AddInfo()
             }
             else
             {
-                var user = {login:res.login,age:res.age,height:res.height,weight:res.weight}
+                var user = {login:userID.login,age:ageVal,height:heightVal,weight:weightVal,id:userID.id}
                 localStorage.setItem('user_data', JSON.stringify(user));
-
+                
                 setMessage('Info Added');
                 window.location.href = '/HomePage';
             }
