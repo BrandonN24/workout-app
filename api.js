@@ -1,8 +1,8 @@
 require('express');
 require('mongodb');
 
-exports.setApp = function (app, client){
-
+exports.setApp = function (app, client)
+{
     app.use((req, res, next) => 
     {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -17,13 +17,6 @@ exports.setApp = function (app, client){
     next();
     });
 
-    // Login API
-    app.post('/api/login', async (req, res, next) => 
-    {
-        // incoming: login, password
-        // outgoing: id, firstName, lastName, error
-           
-        var error = '';
     // Login API
     app.post('/api/login', async (req, res, next) => 
     {
