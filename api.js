@@ -36,18 +36,36 @@ exports.setApp = function (app, client){
         let age = '';
         let height = '';
         let weight = '';
+        let validated = ''; // contains state of whether user has done email verif.
     
+        let ret;
+
         if( results.length > 0 ) {
-            id = results[0]._id;  // case-sensitive to _id field on userInfo document
-            n = results[0].name;  // case-senstive to name field on userInfo document
-            email = results[0].email; // case-senstive to email field on userInfo document
-            age = results[0].age; // case-senstive to age field on userInfo document
-            height = results[0].height; // case-senstive to height field on userInfo document
-            weight = results[0].weight; // case-senstive to weight field on userInfo document
+            id = results[0]._id;              // case-sensitive to _id field on userInfo document
+            n = results[0].name;              // case-senstive to name field on userInfo document
+            email = results[0].email;         // case-senstive to email field on userInfo document
+            age = results[0].age;             // case-senstive to age field on userInfo document
+            height = results[0].height;       // case-senstive to height field on userInfo document
+            weight = results[0].weight;       // case-senstive to weight field on userInfo document
+            validated = results[0].validated; // case-senstive to validated field on userInfo document
+
+            try
+            {
+                const token = require('./createJWT.js');
+                ret = token.createToken(id, n, login, validated);
+            }
+            catch(e)
+            {
+                ret = {error: e.message};
+            }
+        }
+        else
+        {
+            ret = {error: "Login/Password incorrect"};
         }
 
         // return json object containing user info
-        var ret = {id: id, name:n, email: email, age: age, height: height, weight: weight, error:error};
+        //ret = {id: id, name:n, email: email, age: age, height: height, weight: weight, error:error};
         res.status(200).json(ret);
     });
 
@@ -461,6 +479,7 @@ exports.setApp = function (app, client){
     // End of removeExercise API
     // ********************************
 
+    /* EMAIL AUTHENTICATION WORK IN PROGRESS
     app.get('/confirmation/:token', async (req, res) => {
         try{
             const { user: { id } } = jwt.verify(req.params.otken, EMAIL_SECRET);
@@ -472,6 +491,7 @@ exports.setApp = function (app, client){
 
         let bp = require('./PathFront.js');
 
-        return res.redirect(bp.buildPath(''))
-    })
+        return res.redirect(bp.buildPath('')); // redirect to login page
+    })\
+    */
 }
