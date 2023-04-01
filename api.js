@@ -460,4 +460,18 @@ exports.setApp = function (app, client){
     // ********************************
     // End of removeExercise API
     // ********************************
+
+    app.get('/confirmation/:token', async (req, res) => {
+        try{
+            const { user: { id } } = jwt.verify(req.params.otken, EMAIL_SECRET);
+            await db.collection('userInfo').updateOne({"login" : login}, {$set : {"validated" : true}});
+
+        } catch (e) {
+            res.send('error');
+        }
+
+        let bp = require('./PathFront.js');
+
+        return res.redirect(bp.buildPath(''))
+    })
 }
