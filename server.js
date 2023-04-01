@@ -21,6 +21,9 @@ client.connect();
 var api = require('./api.js');
 api.setApp(app, client);
 
+// Email Authentication
+// to be done later
+
 app.listen(PORT, () => 
 {
   console.log('Server listening on port ' + PORT);
