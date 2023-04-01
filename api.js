@@ -59,10 +59,6 @@ exports.setApp = function (app, client){
                 ret = {error: e.message};
             }
         }
-        else
-        {
-            ret = {error: "Login/Password incorrect"};
-        }
 
         // return json object containing user info
         //ret = {id: id, name:n, email: email, age: age, height: height, weight: weight, error:error};
