@@ -1,16 +1,16 @@
 import React from 'react';
 import PageTitle from '../components/PageTitle';
-import Login from '../components/Login';
+import AddInfo from '../components/AddInfo';
 
-const LoginPage = () =>
+const AddInfoPage = () =>
 {
 
     return(
       <div>
         <PageTitle />
-        <Login />
+        <AddInfo />
       </div>
     );
 };
 
-export default LoginPage;
+export default AddInfoPage;
