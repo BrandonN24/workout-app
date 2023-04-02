@@ -1,5 +1,6 @@
 require('express');
 require('mongodb');
+var token = require('./createJWT.js');
 
 exports.setApp = function (app, client)
 {
@@ -21,7 +22,7 @@ exports.setApp = function (app, client)
     app.post('/api/login', async (req, res, next) => 
     {
     // incoming: login, password
-    // outgoing: id, firstName, lastName, error
+    // outgoing: JSON Web Token or negative id value in JSON obj on error
         
     var error = '';
 
@@ -59,6 +60,9 @@ exports.setApp = function (app, client)
             {
                 ret = {error: e.message};
             }
+        }
+        else{
+            ret = {id: id};
         }
 
         // return json object containing user info
@@ -439,6 +443,76 @@ exports.setApp = function (app, client)
     // ********************************
     // End of deleteWorkout API
     // ********************************
+
+    // getUserInfo API
+    app.post('/api/getUserInfo', async (req, res, next) => 
+    {
+        // incoming: id (userID: looks like random string)
+        // outgoing: id, name, email, age, height, weight, hasExercises, validated
+            
+        var error = '';
+
+        const { id, jwtToken } = req.body;
+
+        try
+        {
+            if( token.isExpired(jwtToken))
+            {
+                var r = {error:'The JWT is no longer valid', jwtToken: ''};
+                res.status(200).json(r);
+                return;
+            }
+        }
+        catch(e)
+        {
+            console.log(e.message);
+        }
+
+        var ObjectId = require('mongodb').ObjectId; 
+
+        let objId = new ObjectId(id);
+
+        // Establish connection to database and await info from it.
+        const db = client.db("LargeProject");
+        const results = await db.collection('userInfo').find({_id: objId}).toArray();
+
+        let n = ''; // fill this with name from db.
+        let email = '';
+        let age = '';
+        let height = '';
+        let weight = '';
+        let validated = ''; // contains state of whether user has done email verif.
+        let hasExercises = '';
+        let ret;
+
+        if( results.length > 0 ) {
+            n = results[0].name;              // case-senstive to name field on userInfo document
+            email = results[0].email;         // case-senstive to email field on userInfo document
+            age = results[0].age;             // case-senstive to age field on userInfo document
+            height = results[0].height;       // case-senstive to height field on userInfo document
+            weight = results[0].weight;       // case-senstive to weight field on userInfo document
+            validated = results[0].validated; // case-senstive to validated field on userInfo document
+            hasExercises = results[0].hasExercises;
+        }
+        else{
+            ret = {error: "ID not found"};
+        }
+
+        // return json object containing user info
+        ret = 
+        {   
+            id: id, 
+            name:n,
+            email:email,
+            age: age,
+            height:height,
+            weight: weight,
+            hasExercises: hasExercises,
+            validated: validated,
+            error:error
+        };
+        res.status(200).json(ret);
+    });
 
     // removeExercise API
     // removes a exercise from particular workout

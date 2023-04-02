@@ -10,9 +10,9 @@ exports.createToken = function (id, name, login, validated)
 _createToken = function (id, name, login, validated)
 {
     try
-    {
+    {   
         const expiration = new Date();
-        const user = {userId: id, name: name, validated: validated, login: login};
+        const user = {id: id, name: name, validated: validated, login: login};
 
         const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET);
 

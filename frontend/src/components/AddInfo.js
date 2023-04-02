@@ -12,6 +12,7 @@ function AddInfo()
 
     const doAddInfo = async event =>
     {
+        let storage = require('../tokenStorage.js');
         event.preventDefault();   
         const ageVal = parseInt(addAge.value);
         const heightVal = parseInt(addHeight.value);
@@ -22,7 +23,8 @@ function AddInfo()
             login:userID.login,
             age:ageVal,
             height:heightVal,
-            weight:weightVal
+            weight:weightVal,
+            jwtToken: storage.retrieveToken()
         };
 
         var js = JSON.stringify(temp);
