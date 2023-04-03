@@ -566,4 +566,41 @@ exports.setApp = function (app, client)
         return res.redirect(bp.buildPath('')); // redirect to login page
     })\
     */
+	
+	//- addSet (for during workout, as user goes through workout add sets done for the exercises:
+	// weight, reps, perceived effort | should also update personal bests as a new max weight is entered)
+	app.post('/api/addSet', async(req, res, next) => {		
+		// incoming: exercise, weight, reps, effort, duration, 
+		// outgoing: the set added
+		
+		var error = '';
+        const { id, weight, reps, effort, duration } = req.body;
+
+        const db = client.db("LargeProject");
+
+		
+		ObjectId objId = new ObjectId(id);
+        const results = await db.collection('exerciseInfo').find({_id:objId)}).toArray();
+		
+		if(results.length > 0)
+		{
+			const newSet =
+			{
+				reps:reps;
+				weight:weight;
+				effort:effort;
+				duration:duration;
+			}
+			await db.collection('exerciseInfo').updateOne({_id:ObjectId(exercise_id)}, {$push: {sets: newSet}});
+			res.status(200).json(newSet);
+		}
+		else
+		{
+			error = 'Exercise not found';
+		}
+	});
+	
+    // *****************
+    // End of addSet API
+    // *****************
 }
