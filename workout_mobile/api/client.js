@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const client = axios.create({
-  baseURL: 'https://workout-app-cop4331.herokuapp.com',
+  baseURL: 'http://localhost:5000',
 });
 
 export default client;

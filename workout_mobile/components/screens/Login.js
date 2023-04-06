@@ -34,7 +34,7 @@ const Login = () => {
   const handleLogin = async (values, formikActions) => {
     try {
       const {data} = await client.post('/api/login', {...values});
-      console.log(data.id);
+      console.log(data);
       if (data.id != -1) {
         navigateToHome();
       }
