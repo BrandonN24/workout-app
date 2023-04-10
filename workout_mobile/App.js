@@ -10,6 +10,8 @@ import NewExercise from './components/screens/NewExercise';
 import Profile from './components/screens/Profile';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Settings} from 'react-native/types';
+import AddUserInfo from './components/screens/AddUserInfo';
+import ValidateEmail from './components/screens/ValidateEmail';
 
 const theme = {
   ...DefaultTheme,
@@ -75,6 +77,12 @@ const App = () => {
             setLoggedInState={setLoggedInState}></Stack.Screen>
           <Stack.Screen name="Register" component={Register}></Stack.Screen>
           <Stack.Screen name="HomeScreen" component={HomeTabs}></Stack.Screen>
+          <Stack.Screen
+            name="AddUserInfo"
+            component={AddUserInfo}></Stack.Screen>
+          <Stack.Screen
+            name="ValidateEmail"
+            component={ValidateEmail}></Stack.Screen>
         </Stack.Navigator>
       )}
     </NavigationContainer>

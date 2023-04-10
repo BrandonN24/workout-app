@@ -42,7 +42,14 @@ const Login = ({setLoggedInState}) => {
         //setLoggedInState();
         await AsyncStorage.setItem('data', JSON.stringify(data));
         console.log('Logged in set to true');
-        navigation.navigate('HomeScreen');
+        if (data.validated == false) {
+          navigation.navigate('ValidateEmail');
+        }
+        if (data.height == null && data.age == null && data.weight == null) {
+          navigation.navigate('AddUserInfo');
+        } else {
+          navigation.navigate('HomeScreen');
+        }
       }
       formikActions.resetForm();
       formikActions.setSubmitting(false);
