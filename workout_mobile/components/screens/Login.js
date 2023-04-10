@@ -8,8 +8,9 @@ import CustomFormik from '../CustomFormik';
 import * as yup from 'yup';
 import NavigateButton from '../NavigateButton';
 import client from '../../api/client';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Login = () => {
+const Login = ({setLoggedInState}) => {
   const initialValues = {
     login: '',
     password: '',
@@ -20,7 +21,7 @@ const Login = () => {
     navigation.navigate('Register');
   };
   const navigateToHome = () => {
-    navigation.navigate('Home');
+    navigation.navigate('HomeScreen');
   };
   const validationSchema = yup.object({
     login: yup.string().trim().required('Username is missing!'),
@@ -34,14 +35,19 @@ const Login = () => {
   const handleLogin = async (values, formikActions) => {
     try {
       const {data} = await client.post('/api/login', {...values});
-      console.log(data);
+      console.log(data.id);
       if (data.id != -1) {
-        navigateToHome();
+        console.log(data);
+        //setLoggedIn(true);
+        //setLoggedInState();
+        await AsyncStorage.setItem('data', JSON.stringify(data));
+        console.log('Logged in set to true');
+        navigation.navigate('HomeScreen');
       }
       formikActions.resetForm();
       formikActions.setSubmitting(false);
     } catch (error) {
-      console.log(error?.response?.data);
+      console.log(error);
     }
   };
 
