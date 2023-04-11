@@ -621,17 +621,7 @@ exports.setApp = function (app, client)
 	if(results.length > 0)
 	{
 
-		await db.collection('exerciseInfo').updateOne({_id:ObjectId(exercise_id)}, {$pull: {sets: {_id:setId}}});
-			
-		try
-            	{
-                	const token = require('./createJWT.js');
-                	ret = token.createToken(id, n, login, validated);
-            	}
-            	catch(e)
-            	{
-                	ret = {error: e.message};
-            	}	
+		await db.collection('exerciseInfo').updateOne({_id:ObjectId(exercise_id)}, {$pull: {sets: {_id:setId}}});	
 		
 		res.status(200).json(newSet);
 	}
