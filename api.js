@@ -603,4 +603,45 @@ exports.setApp = function (app, client)
     // *****************
     // End of addSet API
     // *****************
+	
+	app.post('/api/deleteSet', async(req, res, next) => {		
+	// incoming: exercise_id, set_id
+	// outgoing: none
+		
+	var error = '';
+        const { exercise_id, set_id } = req.body;
+
+        const db = client.db("LargeProject");
+
+		
+	ObjectId exerciseId = new ObjectId(exercise_id);
+	ObjectId setId = new ObjectId(set_id);
+        const results = await db.collection('exerciseInfo').find({exercise_id:exerciseId)}).toArray();
+		
+	if(results.length > 0)
+	{
+
+		await db.collection('exerciseInfo').updateOne({_id:ObjectId(exercise_id)}, {$pull: {sets: {_id:setId}}});
+			
+		try
+            	{
+                	const token = require('./createJWT.js');
+                	ret = token.createToken(id, n, login, validated);
+            	}
+            	catch(e)
+            	{
+                	ret = {error: e.message};
+            	}	
+		
+		res.status(200).json(newSet);
+	}
+	else
+	{
+		error = 'Exercise not found';
+		ret = {error: error.message}
+	}
+});
+	// ********************
+	// End of deleteSet API
+    	// ********************
 }
