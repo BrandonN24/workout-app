@@ -61,7 +61,7 @@ function Register()
                 localStorage.setItem('user_data', JSON.stringify(user));
 
                 setMessage('Welcome');
-                window.location.href = '/HomePage';
+                window.location.href = '/';
             }
         }
         catch(e)

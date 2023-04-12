@@ -1,16 +1,16 @@
 import React from 'react';
-import NavBar from '../components/NavBar';
 import PageTitle from '../components/PageTitle';
+import AddInfo from '../components/AddInfo';
 
-const HomePage = () =>
+const AddInfoPage = () =>
 {
 
     return(
       <div>
-        <NavBar />
         <PageTitle />
+        <AddInfo />
       </div>
     );
 };
 
-export default HomePage;
+export default AddInfoPage;

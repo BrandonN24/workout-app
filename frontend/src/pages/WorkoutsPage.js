@@ -1,16 +1,16 @@
 import React from 'react';
 import NavBar from '../components/NavBar';
-import PageTitle from '../components/PageTitle';
+import Workouts from '../components/Workouts';
 
-const HomePage = () =>
+const WorkoutsPage = () =>
 {
 
     return(
       <div>
         <NavBar />
-        <PageTitle />
+        <Workouts />
       </div>
     );
 };
 
-export default HomePage;
+export default WorkoutsPage;
