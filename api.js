@@ -189,13 +189,20 @@ exports.setApp = function (app, client)
 		// Connect to the database and get the user object.
 		const db = client.db("LargeProject");
 
-        const results = await db.collection('userInfo').find({login: login}).toArray();
+        const results = await db.collection('userInfo').find({login: temp}).toArray();
 
         // Try to find and update a user given a login field
         try{
             //if the user is found, or the name passed is "public", add the exercise
             if((results.length > 0) || (temp == "public")) {
-                const result = await db.collection('exerciseInfo').insertOne(newExercise);
+                const usedEName = await db.collection('exerciseInfo').find({public: temp, name: eName}).toArray();
+
+                if(usedEName.length > 0) {
+                    throw "User Already Has This Exercise";
+                } else {
+                    const result = await db.collection('exerciseInfo').insertOne(newExercise);   
+                }
+
             } else {
                 throw "No Such User";
             }
@@ -232,60 +239,47 @@ exports.setApp = function (app, client)
             temp = login;
         }
 
-        var tempDate = new Date();
-        tempDate.setUTCFullYear(1999, 12, 31);
-		
-        const newWorkout = {
-            name: name,
-            public: temp,
-            dateDone: tempDate,
-            caloriesBurned: -1,
-            duration: -1,
-            exercises: []
-        };
+        const takenWName = await db.collection('workoutInfo').find({public: temp, name: name}).toArray();
 
-        const results = await db.collection('userInfo').find({login: temp}).toArray();
-
-        try {
-            if(!(results.length > 0) && temp != "public") {
-                throw "No Such User";
+        if(takenWName.length != 0) {
+            var ret = "Workout Name Already Used By User";
+            res.status(400).json({error: ret});
+        } else {
+            var tempDate = new Date();
+            tempDate.setUTCFullYear(1999, 12, 31);
+            
+            const newWorkout = {
+                name: name,
+                public: temp,
+                dateDone: tempDate,
+                caloriesBurned: -1,
+                duration: -1,
+                exercises: []
+            };
+    
+            const results = await db.collection('userInfo').find({login: temp}).toArray();
+    
+            try {
+                if(!(results.length > 0) && temp != "public") {
+                    throw "No Such User";
+                }
+    
+                const result = await db.collection('workoutInfo').insertOne(newWorkout);
+    
+                var ret = {error:error};
+                res.status(200).json(ret);
+            } catch(e) {
+                error = e.toString();
+                // return error code 400, bad request.
+    
+                var ret = {error:error};
+                res.status(400).json({error: error});
             }
-
-            const result = await db.collection('workoutInfo').insertOne(newWorkout);
-
-            var ret = {error:error};
-            res.status(200).json(ret);
-        } catch(e) {
-            error = e.toString();
-            // return error code 400, bad request.
-
-            var ret = {error:error};
-            res.status(400).json({error: error});
         }
     });
 
     // ********************************
     // End of createWorkoutTemplate API
-    // ********************************
-
-    // getExercises API
-    // Not sure
-    app.post('/api/getExercises', async (req, res, next) => {
-    	// incoming: none
-	    // outgoing: an array containing the user's exercises
-	
-        var error = '';
-	    const db = client.db("LargeProject");
-	
-        // return all results but exclude the fields that aren't the exercises array
-        const results = await db.collection('workoutInfo').find({},{_id:0},{name:0},{date:0},{duration:0},{calories_burned:0}).toArray();
-		
-	    var ret = {error:error};
-        res.status(200).json(ret);
-    });
-
-    // ********************************
-    // End of getExercises API
     // ********************************
 
     // searchExercise API
@@ -309,10 +303,8 @@ exports.setApp = function (app, client)
                 throw "No Such User";
             }
 
-            const result = await db.collection('exerciseInfo').find({public: searchPublic}).toArray();
+            const result = await db.collection('exerciseInfo').find({$or: [{public: "public"}, {public: searchPublic}]}).toArray();
         
-            result.push(await db.collection('exerciseInfo').find({public: "public"}).toArray());
-
             var ret = {exercises: result};
             res.status(200).json(ret);
         } catch(e) {
@@ -349,7 +341,7 @@ exports.setApp = function (app, client)
                 throw "No Such User";
             }
 
-            const result = await db.collection('workoutInfo').find({public: searchPublic}).toArray();
+            const result = await db.collection('workoutInfo').find({$or: [{public: "public"}, {public: searchPublic}]}).toArray();
         
             result.push(await db.collection('workoutInfo').find({public: "public"}).toArray());
 
@@ -567,71 +559,140 @@ exports.setApp = function (app, client)
     })\
     */
 	
-	//- addSet (for during workout, as user goes through workout add sets done for the exercises:
-	// weight, reps, perceived effort | should also update personal bests as a new max weight is entered)
+    
+	//addSet API
+    //adds a set to an exercise in the exerciseInfo DB, not the workoutInfo DB
 	app.post('/api/addSet', async(req, res, next) => {		
-		// incoming: exercise, weight, reps, effort, duration, 
+		// incoming: exercise name, login, weight, reps, effort 
 		// outgoing: the set added
 		
 		var error = '';
-        const { id, weight, reps, effort, duration } = req.body;
+        var temp = '';
+        const { eName, login, effort, reps, weight } = req.body;
 
         const db = client.db("LargeProject");
 
+        if(login.toLowerCase() == "public") {
+            temp = login.toLowerCase();
+        } else {
+            temp = login;
+        }
+
+        const results = await db.collection('exerciseInfo').find({name: eName, public: temp}).toArray();
+
+        try {
+            if(results.length > 0) {
+                const newSet = {
+                    effort:effort,
+                    reps:reps,
+                    weight:weight
+                }
+
+                await db.collection('exerciseInfo').updateOne({name:eName, public: temp}, {$push: {sets: newSet}});
+                res.status(200).json(newSet);
+            } else {
+                throw "No Such Exercise";
+            }
+
+        } catch (e) {
+            // set error message to error from DB if that point fails.
+            error = e.toString();
+
+            var ret = {error:error};
+            res.status(404).json(ret);
+        }
 		
-		ObjectId objId = new ObjectId(id);
-        const results = await db.collection('exerciseInfo').find({_id:objId)}).toArray();
 		
-		if(results.length > 0)
-		{
-			const newSet =
-			{
-				reps:reps;
-				weight:weight;
-				effort:effort;
-				duration:duration;
-			}
-			await db.collection('exerciseInfo').updateOne({_id:ObjectId(exercise_id)}, {$push: {sets: newSet}});
-			res.status(200).json(newSet);
-		}
-		else
-		{
-			error = 'Exercise not found';
-		}
 	});
 	
     // *****************
     // End of addSet API
     // *****************
-	
+
+    //deleteSet API
+    //adds a set to an exercise in the exerciseInfo DB, not the workoutInfo DB
 	app.post('/api/deleteSet', async(req, res, next) => {		
-	// incoming: exercise_id, set_id
-	// outgoing: none
+		// incoming: exercise name, login
+		// outgoing: the set added
 		
-	var error = '';
-        const { exercise_id, set_id } = req.body;
+		var error = '';
+        var temp = '';
+        const { eName, login} = req.body;
 
         const db = client.db("LargeProject");
 
-		
-	ObjectId exerciseId = new ObjectId(exercise_id);
-	ObjectId setId = new ObjectId(set_id);
-        const results = await db.collection('exerciseInfo').find({exercise_id:exerciseId)}).toArray();
-		
-	if(results.length > 0)
-	{
+        if(login.toLowerCase() == "public") {
+            temp = login.toLowerCase();
+        } else {
+            temp = login;
+        }
 
-		await db.collection('exerciseInfo').updateOne({_id:ObjectId(exercise_id)}, {$pull: {sets: {_id:setId}}});	
+        const results = await db.collection('exerciseInfo').find({name: eName, public: temp}).toArray();
+
+        try {
+            if(results.length > 0) {
+                await db.collection('exerciseInfo').updateOne({name:eName, public: temp}, {$pop: {sets: -1}});
+
+                var ret = "Deleted Set";
+                res.status(200).json(ret);
+            } else {
+                throw "No Such Exercise";
+            }
+
+        } catch (e) {
+            // set error message to error from DB if that point fails.
+            error = e.toString();
+
+            var ret = {error:error};
+            res.status(404).json(ret);
+        }
+	});
+	
+    // *****************
+    // End of deleteSet API
+    // *****************
+
+    //getPBs API
+    //agets the 
+	app.post('/api/getPBs', async(req, res, next) => {		
+		// incoming: exercise, weight, reps, effort, duration, 
+		// outgoing: the set added
 		
-		res.status(200).json(newSet);
-	}
-	else
-	{
-		error = 'Exercise not found';
-		ret = {error: error.message}
-	}
-});
-	// ********************
-	// End of deleteSet API
-    	// ********************
+		var error = '';
+        const {login} = req.body;
+
+        const db = client.db("LargeProject");
+
+        const results = await db.collection('userInfo').find({login: login}).toArray();
+
+        try {
+            if(results.length > 0) {
+                if(results[0].hasExercises.length > 0) {
+                    var ret = [];
+
+                    for(var i = 0; i < results[0].hasExercises.length; i++) {
+                        ret[i] = results[0].hasExercises[i].exerciseName + ": " + results[0].hasExercises[i].personalBest;
+                    }
+    
+                    res.status(200).json(ret);
+                } else {
+                    throw "No Personal Bests";
+                }
+               
+            } else {
+                throw "No Such User";
+            }
+
+        } catch (e) {
+            // set error message to error from DB if that point fails.
+            error = e.toString();
+
+            var ret = {error:error};
+            res.status(404).json(ret);
+        }
+	});
+	
+    // *****************
+    // End of getPBs API
+    // *****************
 }
