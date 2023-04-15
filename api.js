@@ -65,8 +65,8 @@ exports.setApp = function (app, client)
             ret = {id: id};
         }
 
-        // return json object containing user info
-        //ret = {id: id, name:n, email: email, age: age, height: height, weight: weight, error:error};
+        
+        // return the json object containing the token or a negative id upon error
         res.status(200).json(ret);
     });
 
@@ -95,7 +95,8 @@ exports.setApp = function (app, client)
             height: -1, 
             weight: -1, 
             hasExercises: [], 
-            validated: false
+            validated: false,
+            vCode: ""
         };
 
         const db = client.db("LargeProject");
@@ -126,13 +127,28 @@ exports.setApp = function (app, client)
     // addUserInfo API
     // When the user first logs into their account they are prompted to input their age, weight, and height.
 	app.post('/api/addUserInfo', async (req, res, next) => {
-		// incoming: age, weight, height, login (to search for the user in the database)
-		// outgoing: error message
+		// incoming: age, weight, height, login (to search for the user in the database), jwtToken
+		// outgoing: error message, refreshedToken
 		
 		var error = '';
 
-		const { login, age, weight, height } = req.body;
+		const { login, age, weight, height, jwtToken } = req.body;
 		
+        // Check to see if token is expired, return error if so
+        try
+        {
+            if( token.isExpired(jwtToken))
+            {
+                var r = {error:'The JWT is no longer valid', jwtToken: ''};
+                res.status(401).json(r);
+                return;
+            }
+        }
+        catch(e)
+        {
+            console.log(e.message);
+        }
+
 		// Connect to the database and get the user object.
 		const db = client.db("LargeProject");
 
@@ -152,7 +168,22 @@ exports.setApp = function (app, client)
             error = "User not found";
         }
 
-        var ret = {error:error};
+        // refresh token if prev. tok not expired
+        let refreshedToken = null;
+        try
+        {
+            refreshedToken = token.refresh(jwtToken);
+        }
+        catch(e)
+        {
+            console.log(e.message);
+        }
+
+        let ret = 
+        {
+            error:error,
+            refreshedToken: refreshedToken
+        };
         res.status(200).json(ret);
 	});
 
@@ -160,16 +191,247 @@ exports.setApp = function (app, client)
     // End of addUserInfo API
     // **********************
 
+    // nodemailer setup
+    // draw from dependencies
+    const nodemailer = require('nodemailer');
+    const { v4: uuidv4 } = require('uuid');
+    // create the transporter object
+    const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'workoutappgroup9@gmail.com',
+        pass: 'wqdlbnimieqxzkee'
+    }
+    });
+
+    //sendEmail API
+    //Endpoint to initiate the email verification process
+    app.post('/api/sendEmail', async (req, res) => {
+        // incoming: email, jwtToken
+        // outgoing: message, refreshedToken
+
+        // error codes:
+        // 401 - expired token, unauth'd access
+        // 500 - email send error
+
+        const { email, jwtToken } = req.body;
+
+        // Check to see if token expired, return error if so
+        try
+        {
+            if( token.isExpired(jwtToken))
+            {
+                var r = {error:'The JWT is no longer valid', jwtToken: ''};
+                res.status(401).json(r);
+                return;
+            }
+        }
+        catch(e)
+        {
+            console.log(e.message);
+        }
+
+        // refresh the token if prev. token not expired
+        let refreshedToken = null;
+        try
+        {
+            refreshedToken = token.refresh(jwtToken);
+        }
+        catch(e)
+        {
+            console.log(e.message);
+        }
+
+        // Generate a verification code
+        const verificationCode = uuidv4();
+
+        let ret = {};
+
+        // Connect to the database and get the user object.
+		const db = client.db("LargeProject");
+
+        // Try to find and update a user given a login field and 
+        // update with the given age, height, and weight parameters.
+        try{
+            result = await db.collection('userInfo').updateOne({"email" : email}, {$set: {"vCode" : verificationCode}});
+        } catch(e) {
+            error = e.toString();
+            // return error code 400, bad request.
+            res.status(400).json({error: error});
+        }
+
+         // Send the verification code to the user's email address
+         transporter.sendMail({
+            from: 'workoutappgroup9@gmail.com',
+            to: req.body.email,
+            subject: 'Email Verification Code',
+            text: `Your email verification code is: ${verificationCode}`,
+        }, (error, info) => {
+            if (error) {
+                console.log(error);
+
+                // create json payload for outgoing
+                ret =
+                {
+                    message : "Error sending email",
+                    refreshedToken : refreshedToken
+                }
+
+                res.status(500).json(ret);
+            } 
+            else {
+                console.log('Email sent: ' + info.response);
+
+                // Store the verification code in the database or cache
+                // associated with the user's email address for later verification
+
+                // create json payload for outgoing
+                ret =
+                {
+                    message : "Verification email sent",
+                    refreshedToken : refreshedToken
+                }
+
+                // Return a success response to the client
+                res.status(200).json(ret);
+            }
+        });
+    });
+
+    // ********************************
+    // End of sendEmail API
+    // ********************************
+
+    // verifyEmail API
+    // Checks if the User has inputted the correct verification code
+    app.post('/api/verifyEmail', async (req, res) => {
+
+        // incoming: email, verificationCode, jwtToken
+        // outgoing: error, refreshedToken
+
+        const { email, verificationCode, jwtToken } = req.body;
+        
+        // Check to see if token is expired
+        try
+        {
+            if( token.isExpired(jwtToken))
+            {
+                var r = {error:'The JWT is no longer valid', jwtToken: ''};
+                res.status(401).json(r);
+                return;
+            }
+        }
+        catch(e)
+        {
+            console.log(e.message);
+        }
+
+        // refresh the token if prev. tok not expired
+        let refreshedToken = null;
+        try
+        {
+            refreshedToken = token.refresh(jwtToken);
+        }
+        catch(e)
+        {
+            console.log(e.message);
+        }
+
+        let ret = {};
+
+        try {
+            // Find the user in the database by email
+            const db = client.db("LargeProject");
+            const user = await db.collection('userInfo').find({email: email}).toArray();
+      
+            // Check if the verification code matches the one stored in the user object
+            if(user.length > 0) {
+                if (user[0].vCode === verificationCode) {
+
+                    // Set the verified status to true and save the user object
+                    await db.collection('userInfo').updateOne({"email": email}, {$set: {validated : true}});
+                    
+                    // Create the json payload
+                    ret =
+                    {
+                        message: "Validated",
+                        refreshedToken: refreshedToken
+                    }
+
+                    res.status(200).json(ret);
+                } 
+                else {
+                    // create the json payload
+                    ret =
+                    {
+                        message: "Invalid Verification code",
+                        refreshedToken: refreshedToken
+                    }
+                    // Return an error if the verification code is invalid
+                    res.status(400).json(ret);
+                }
+            } 
+            else 
+            {
+                throw "No Such User";
+            }
+            
+        } 
+        catch (e) 
+        {
+            error = e.toString();
+
+            // Create the json payload
+            ret = 
+            {
+                error: error,
+                refreshedToken: refreshedToken
+            }
+
+            res.status(404).json(ret);
+        }
+    });
+
+    // ********************************
+    // End of verifyEmail API
+    // ********************************
+
     // createExercise API
     // User adds an Exercise to their Database
     app.post('/api/createExercise', async (req, res, next) => {
-		// incoming: exercise name and login
-		// outgoing: none
+		// incoming: exercise, name, login, caloriesBurned, caloriesPerRep, and jwtToken
+		// outgoing: error message, refreshedToken
 
 		var error = '';
         var temp = '';
 
-		const { eName, login, caloriesBurned, caloriesPerRep } = req.body;
+		const { eName, login, caloriesBurned, caloriesPerRep, jwtToken } = req.body;
+        
+        // Check to see if token is expired, return error if so
+        try
+        {
+            if( token.isExpired(jwtToken))
+            {
+                var r = {error:'The JWT is no longer valid', jwtToken: ''};
+                res.status(401).json(r);
+                return;
+            }
+        }
+        catch(e)
+        {
+            console.log(e.message);
+        }
+
+        // refresh the token if prev. token not epxired
+        let refreshedToken = null;
+        try
+        {
+            refreshedToken = token.refresh(jwtToken);
+        }
+        catch(e)
+        {
+            console.log(e.message);
+        }
 
         if(login.toLowerCase() == "public") {
             temp = login.toLowerCase();
@@ -186,27 +448,38 @@ exports.setApp = function (app, client)
             caloriesPerRep: caloriesPerRep
         };
 
+        // create json outgoing payload
+        let ret = {};
+
 		// Connect to the database and get the user object.
 		const db = client.db("LargeProject");
 
-        const results = await db.collection('userInfo').find({login: login}).toArray();
+        const results = await db.collection('userInfo').find({login: temp}).toArray();
 
         // Try to find and update a user given a login field
         try{
             //if the user is found, or the name passed is "public", add the exercise
             if((results.length > 0) || (temp == "public")) {
-                const result = await db.collection('exerciseInfo').insertOne(newExercise);
+                const usedEName = await db.collection('exerciseInfo').find({public: temp, name: eName}).toArray();
+
+                if(usedEName.length > 0) {
+                    throw "User Already Has This Exercise";
+                } else {
+                    const result = await db.collection('exerciseInfo').insertOne(newExercise);   
+                }
+
             } else {
                 throw "No Such User";
             }
 
-            var ret = {error:error};
+            ret = {error:error, refreshedToken: refreshedToken};
             res.status(200).json(ret);
         } catch(e) {
             error = e.toString();
             // return error code 400, bad request.
-            res.status(400).json({error: error});
+            res.status(400).json({error: error, refreshedToken: refreshedToken});
         }
+
     });
 
     // ********************************
@@ -216,15 +489,48 @@ exports.setApp = function (app, client)
     // createWorkoutTemplate API
     // Creates a Workout object
     app.post('/api/createWorkoutTemplate', async (req, res, next) => {
-		// incoming: age, weight, height, login (to search for the user in the database)
-		// outgoing: error message
+		// incoming: name (of workout), login, jwtToken
+		// outgoing: error message, refreshedToken
 		
+        // error codes:
+        // 401 - token expired
+        // 400 - workout name taken
+        // 200 - successful operation
+
 		var error = '';
         var temp = '';
+        let ret = {};
 
         const db = client.db("LargeProject");
 
-		const { name, login } = req.body;
+		const { name, login, jwtToken } = req.body;
+
+        // Check to see if token is expired, return error if so
+        try
+        {
+            if( token.isExpired(jwtToken))
+            {
+                var r = {error:'The JWT is no longer valid', jwtToken: ''};
+                res.status(401).json(r);
+                return;
+            }
+        }
+        catch(e)
+        {
+            console.log(e.message);
+        }
+
+
+        // refresh the token if prev. token not expired
+        let refreshedToken = null;
+        try
+        {
+            refreshedToken = token.refresh(jwtToken);
+        }
+        catch(e)
+        {
+            console.log(e.message);
+        }
 
         if(login.toLowerCase() == "public") {
             temp = login.toLowerCase();
@@ -232,35 +538,55 @@ exports.setApp = function (app, client)
             temp = login;
         }
 
-        var tempDate = new Date();
-        tempDate.setUTCFullYear(1999, 12, 31);
-		
-        const newWorkout = {
-            name: name,
-            public: temp,
-            dateDone: tempDate,
-            caloriesBurned: -1,
-            duration: -1,
-            exercises: []
-        };
+        const takenWName = await db.collection('workoutInfo').find({public: temp, name: name}).toArray();
 
-        const results = await db.collection('userInfo').find({login: temp}).toArray();
-
-        try {
-            if(!(results.length > 0) && temp != "public") {
-                throw "No Such User";
+        if(takenWName.length != 0) {
+            ret = 
+            {
+                error: "Workout Name Already Used By User",
+                refreshedToken : refreshedToken
             }
-
-            const result = await db.collection('workoutInfo').insertOne(newWorkout);
-
-            var ret = {error:error};
-            res.status(200).json(ret);
-        } catch(e) {
-            error = e.toString();
-            // return error code 400, bad request.
-
-            var ret = {error:error};
-            res.status(400).json({error: error});
+            res.status(400).json(ret);
+        } 
+        else {
+            var tempDate = new Date();
+            tempDate.setUTCFullYear(1999, 12, 31);
+            
+            const newWorkout = {
+                name: name,
+                public: temp,
+                dateDone: tempDate,
+                caloriesBurned: -1,
+                duration: -1,
+                exercises: []
+            };
+    
+            const results = await db.collection('userInfo').find({login: temp}).toArray();
+    
+            try {
+                if(!(results.length > 0) && temp != "public") {
+                    throw "No Such User";
+                }
+    
+                const result = await db.collection('workoutInfo').insertOne(newWorkout);
+    
+                ret = 
+                {
+                    error: "",
+                    refreshedToken : refreshedToken
+                }
+                res.status(200).json(ret);
+            } catch(e) {
+                error = e.toString();
+                // return error code 400, bad request.
+    
+                ret = 
+                {
+                    error: error,
+                    refreshedToken : refreshedToken
+                }
+                res.status(400).json({error: error});
+            }
         }
     });
 
@@ -268,39 +594,52 @@ exports.setApp = function (app, client)
     // End of createWorkoutTemplate API
     // ********************************
 
-    // getExercises API
-    // Not sure
-    app.post('/api/getExercises', async (req, res, next) => {
-    	// incoming: none
-	    // outgoing: an array containing the user's exercises
-	
-        var error = '';
-	    const db = client.db("LargeProject");
-	
-        // return all results but exclude the fields that aren't the exercises array
-        const results = await db.collection('workoutInfo').find({},{_id:0},{name:0},{date:0},{duration:0},{calories_burned:0}).toArray();
-		
-	    var ret = {error:error};
-        res.status(200).json(ret);
-    });
-
-    // ********************************
-    // End of getExercises API
-    // ********************************
-
     // searchExercise API
     // gets all exercises the user personally has as well as all public exercises
     app.post('/api/searchExercise', async(req, res, next) => {
-        // incoming: login
-        // outgoing: all exercises this user has
+        // incoming: login, jwtToken
+        // outgoing: all exercises this user has, refreshedToken
+
+        // error codes:
+        // 200 - normal operation
+        // 401 - token expired
 
         var error = '';
 
-        const { userName } = req.body;
+        const { login, jwtToken } = req.body;
+
+        // Check to see if token is expired, return error if so
+        try
+        {
+            if( token.isExpired(jwtToken))
+            {
+                var r = {error:'The JWT is no longer valid', jwtToken: ''};
+                res.status(401).json(r);
+                return;
+            }
+        }
+        catch(e)
+        {
+            console.log(e.message);
+        }
+
+        // refresh the token if prev. token not expired
+        let refreshedToken = null;
+        try
+        {
+            refreshedToken = token.refresh(jwtToken);
+        }
+        catch(e)
+        {
+            console.log(e.message);
+        }
 
         const db = client.db("LargeProject");
 
-        const results = await db.collection('userInfo').find({login: userName}).toArray();
+        const results = await db.collection('userInfo').find({login: login}).toArray();
+
+        // initialize a json outgoing payload object
+        let ret = {};
 
         try {
             if(results.length > 0) {
@@ -309,17 +648,15 @@ exports.setApp = function (app, client)
                 throw "No Such User";
             }
 
-            const result = await db.collection('exerciseInfo').find({public: searchPublic}).toArray();
+            const result = await db.collection('exerciseInfo').find({$or: [{public: "public"}, {public: searchPublic}]}).toArray();
         
-            result.push(await db.collection('exerciseInfo').find({public: "public"}).toArray());
-
-            var ret = {exercises: result};
+            ret = {exercises: result, refreshedToken: refreshedToken};
             res.status(200).json(ret);
         } catch(e) {
             // set error message to error from DB if that point fails.
             error = e.toString();
 
-            var ret = {error:error};
+            ret = {error:error, refreshedToken: refreshedToken};
             res.status(404).json(ret);
         }
     });
@@ -331,16 +668,50 @@ exports.setApp = function (app, client)
     // searchWorkout API
     // gets all workouts the user personally has as well as all public workouts
     app.post('/api/searchWorkout', async(req, res, next) => {
-        // incoming: login
-        // outgoing: all exercises this user has
+        // incoming: login, jwtToken
+        // outgoing: all workouts this user has, refreshedToken
+
+        // error codes:
+        // 200 - normal operation
+        // 401 - token expired
+        // 404 - could not find user
 
         var error = '';
 
-        const { userName } = req.body;
+        const { login, jwtToken } = req.body;
+
+        // Check to see if token is expired, return error if so
+        try
+        {
+            if( token.isExpired(jwtToken))
+            {
+                var r = {error:'The JWT is no longer valid', jwtToken: ''};
+                res.status(401).json(r);
+                return;
+            }
+        }
+        catch(e)
+        {
+            console.log(e.message);
+        }
+
+        // refresh the token if prev. token not expired
+        let refreshedToken = null;
+        try
+        {
+            refreshedToken = token.refresh(jwtToken);
+        }
+        catch(e)
+        {
+            console.log(e.message);
+        }
 
         const db = client.db("LargeProject");
 
-        const results = await db.collection('userInfo').find({login: userName}).toArray();
+        const results = await db.collection('userInfo').find({login: login}).toArray();
+
+        // create json outgoing payload object
+        let ret = {};
 
         try {
             if(results.length > 0) {
@@ -349,18 +720,18 @@ exports.setApp = function (app, client)
                 throw "No Such User";
             }
 
-            const result = await db.collection('workoutInfo').find({public: searchPublic}).toArray();
+            const result = await db.collection('workoutInfo').find({$or: [{public: "public"}, {public: searchPublic}]}).toArray();
         
             result.push(await db.collection('workoutInfo').find({public: "public"}).toArray());
 
-            var ret = {workouts: result};
+            ret = {workouts: result, refreshedToken: refreshedToken};
             res.status(200).json(ret);
         } catch(e) {
             // set error message to error from DB if that point fails.
             error = e.toString();
 
             // return error code 404, User not found
-            var ret = {error:error};
+            ret = {error:error, refreshedToken: refreshedToken};
             res.status(404).json(ret);
         }
     });
@@ -372,16 +743,50 @@ exports.setApp = function (app, client)
     // deleteExercise API
     // deletes an exercise from a user's list
     app.post('/api/deleteExercise', async(req, res, next) => {
-        // incoming: exercise name, login
-        // outgoing: none
+        // incoming: exercise name, login, jwtToken
+        // outgoing: error, refreshedToken
+
+        // error codes:
+        // 200 - normal operation
+        // 401 - token expired
+        // 404 - could not find user
 
         var error = '';
 
-        const { eName, userName } = req.body;
+        const { eName, login, jwtToken } = req.body;
+
+        // Check to see if token is expired, return error if so
+        try
+        {
+            if( token.isExpired(jwtToken))
+            {
+                var r = {error:'The JWT is no longer valid', jwtToken: ''};
+                res.status(401).json(r);
+                return;
+            }
+        }
+        catch(e)
+        {
+            console.log(e.message);
+        }
+
+        // refresh the token if prev. token not expired
+        let refreshedToken = null;
+        try
+        {
+            refreshedToken = token.refresh(jwtToken);
+        }
+        catch(e)
+        {
+            console.log(e.message);
+        }
 
         const db = client.db("LargeProject");
 
-        const results = await db.collection('userInfo').find({login: userName}).toArray();
+        const results = await db.collection('userInfo').find({login: login}).toArray();
+
+        // create json outgoing payload object
+        let ret = {};
 
         try {
             //no such user has been found
@@ -389,16 +794,16 @@ exports.setApp = function (app, client)
                 throw "No Such User";
             }
 
-            const result = await db.collection('exerciseInfo').deleteOne({name: eName, public: userName});     
+            const result = await db.collection('exerciseInfo').deleteOne({name: eName, public: login});     
             
-            var ret = {error:error};
+            ret = {error:error, refreshedToken: refreshedToken};
             res.status(200).json(ret);
         } catch(e) {
             // set error message to error from DB if that point fails.
             error = e.toString();
 
             // return error code 404, User not found
-            var ret = {error:error};
+            ret = {error:error, refreshedToken: refreshedToken};
             res.status(404).json(ret);
         }
     });
@@ -410,32 +815,66 @@ exports.setApp = function (app, client)
     // deleteWorkout API
     // deletes a workout from a user's list
     app.post('/api/deleteWorkout', async(req, res, next) => {
-        // incoming: workout name, login
-        // outgoing: none
+        // incoming: workout name, login, jwtToken
+        // outgoing: error, refreshedToken
+
+        // error codes:
+        // 200 - normal operation
+        // 401 - token expired
+        // 404 - could not find user
 
         var error = '';
 
-        const { wName, userName } = req.body;
+        const { wName, login, jwtToken } = req.body;
+
+        // Check to see if token is expired, return error if so
+        try
+        {
+            if( token.isExpired(jwtToken))
+            {
+                var r = {error:'The JWT is no longer valid', jwtToken: ''};
+                res.status(401).json(r);
+                return;
+            }
+        }
+        catch(e)
+        {
+            console.log(e.message);
+        }
+
+        // refresh the token if prev. token not expired
+        let refreshedToken = null;
+        try
+        {
+            refreshedToken = token.refresh(jwtToken);
+        }
+        catch(e)
+        {
+            console.log(e.message);
+        }
 
         const db = client.db("LargeProject");
 
-        const results = await db.collection('userInfo').find({login: userName}).toArray();
+        const results = await db.collection('userInfo').find({login: login}).toArray();
+
+        // create json outgoing payload object
+        let ret = {};        
 
         try {
             if(!(results.length > 0)) {
                 throw "No Such User";
             }
 
-            const result = await db.collection('workoutInfo').deleteOne({name: wName, public: userName});      
+            const result = await db.collection('workoutInfo').deleteOne({name: wName, public: login});      
             
-            var ret = {error:error};
+            ret = {error:error, refreshedToken: refreshedToken};
             res.status(200).json(ret);
         } catch(e) {
             // set error message to error from DB if that point fails.
             error = e.toString();
 
             // return error code 404, User not found
-            var ret = {error:error};
+            ret = {error:error, refreshedToken: refreshedToken};
             res.status(404).json(ret);
         }
     });
@@ -447,9 +886,13 @@ exports.setApp = function (app, client)
     // getUserInfo API
     app.post('/api/getUserInfo', async (req, res, next) => 
     {
-        // incoming: id (userID: looks like random string)
-        // outgoing: id, name, email, age, height, weight, hasExercises, validated
-            
+        // incoming: id (userID: looks like random string), jwtToken
+        // outgoing: id, name, email, age, height, weight, hasExercises, validated, refreshedToken, error
+        
+        // error codes:
+        // 401 - expired token
+        // 200 - normal operation
+
         var error = '';
 
         const { id, jwtToken } = req.body;
@@ -459,7 +902,7 @@ exports.setApp = function (app, client)
             if( token.isExpired(jwtToken))
             {
                 var r = {error:'The JWT is no longer valid', jwtToken: ''};
-                res.status(200).json(r);
+                res.status(401).json(r);
                 return;
             }
         }
@@ -498,6 +941,16 @@ exports.setApp = function (app, client)
             ret = {error: "ID not found"};
         }
 
+        let refreshedToken = null;
+        try
+        {
+            refreshedToken = token.refresh(jwtToken);
+        }
+        catch(e)
+        {
+            console.log(e.message);
+        }
+
         // return json object containing user info
         ret = 
         {   
@@ -509,6 +962,7 @@ exports.setApp = function (app, client)
             weight: weight,
             hasExercises: hasExercises,
             validated: validated,
+            jwtToken : refreshedToken,
             error:error
         };
         res.status(200).json(ret);
@@ -550,20 +1004,243 @@ exports.setApp = function (app, client)
     // ********************************
     // End of removeExercise API
     // ********************************
+    
+	//addSet API
+    //adds a set to an exercise in the exerciseInfo DB, not the workoutInfo DB
+	app.post('/api/addSet', async(req, res, next) => {		
+		// incoming: exercise name, login, weight, reps, effort, jwtToken
+		// outgoing: the set added, error, refreshedToken
+		
+        // error codes:
+        // 401 - expired token
+        // 200 - normal operation
+        // 404 - something went wrong with DB update call
 
-    /* EMAIL AUTHENTICATION WORK IN PROGRESS
-    app.get('/confirmation/:token', async (req, res) => {
-        try{
-            const { user: { id } } = jwt.verify(req.params.otken, EMAIL_SECRET);
-            await db.collection('userInfo').updateOne({"login" : login}, {$set : {"validated" : true}});
+		var error = '';
+        var temp = '';
+        const { eName, login, effort, reps, weight, jwtToken } = req.body;
 
-        } catch (e) {
-            res.send('error');
+        // Check to see if token is expired, return error if so
+        try
+        {
+            if( token.isExpired(jwtToken))
+            {
+                var r = {error:'The JWT is no longer valid', jwtToken: ''};
+                res.status(401).json(r);
+                return;
+            }
+        }
+        catch(e)
+        {
+            console.log(e.message);
         }
 
-        let bp = require('./PathFront.js');
+        // refresh the token if prev. token not expired
+        let refreshedToken = null;
+        try
+        {
+            refreshedToken = token.refresh(jwtToken);
+        }
+        catch(e)
+        {
+            console.log(e.message);
+        }
 
-        return res.redirect(bp.buildPath('')); // redirect to login page
-    })\
-    */
+        const db = client.db("LargeProject");
+
+        if(login.toLowerCase() == "public") {
+            temp = login.toLowerCase();
+        } else {
+            temp = login;
+        }
+
+        const results = await db.collection('exerciseInfo').find({name: eName, public: temp}).toArray();
+
+        // create json outgoing payload object
+        let ret = {};
+
+        try {
+            if(results.length > 0) {
+                const newSet = {
+                    effort:effort,
+                    reps:reps,
+                    weight:weight
+                }
+
+                await db.collection('exerciseInfo').updateOne({name:eName, public: temp}, {$push: {sets: newSet}});
+                ret = {newSet: newSet, error: error, refreshedToken: refreshedToken};
+                res.status(200).json(ret);
+            } else {
+                throw "No Such Exercise";
+            }
+
+        } catch (e) {
+            // set error message to error from DB if that point fails.
+            error = e.toString();
+
+            ret = {error:error, refreshedToken: refreshedToken};
+            res.status(404).json(ret);
+        }
+		
+		
+	});
+	
+    // *****************
+    // End of addSet API
+    // *****************
+
+    //deleteSet API
+    //adds a set to an exercise in the exerciseInfo DB, not the workoutInfo DB
+	app.post('/api/deleteSet', async(req, res, next) => {		
+		// incoming: exercise name, login, jwtToken
+		// outgoing: the set added, error, refreshedToken
+
+        // error codes:
+        // 200 - normal operation
+        // 401 - expired token
+        // 404 - something went wrong with DB call
+		
+		var error = '';
+        var temp = '';
+        const { eName, login, jwtToken } = req.body;
+
+        // Check to see if token is expired, return error if so
+        try
+        {
+            if( token.isExpired(jwtToken))
+            {
+                var r = {error:'The JWT is no longer valid', jwtToken: ''};
+                res.status(401).json(r);
+                return;
+            }
+        }
+        catch(e)
+        {
+            console.log(e.message);
+        }
+
+        // refresh the token if prev. token not expired
+        let refreshedToken = null;
+        try
+        {
+            refreshedToken = token.refresh(jwtToken);
+        }
+        catch(e)
+        {
+            console.log(e.message);
+        }
+
+        const db = client.db("LargeProject");
+
+        if(login.toLowerCase() == "public") {
+            temp = login.toLowerCase();
+        } else {
+            temp = login;
+        }
+
+        const results = await db.collection('exerciseInfo').find({name: eName, public: temp}).toArray();
+
+        // Create json outgoing payload object
+        let ret = {};
+
+        try {
+            if(results.length > 0) {
+                await db.collection('exerciseInfo').updateOne({name:eName, public: temp}, {$pop: {sets: -1}});
+
+                ret = {error: "Deleted Set", refreshedToken: refreshedToken};
+                res.status(200).json(ret);
+            } else {
+                throw "No Such Exercise";
+            }
+
+        } catch (e) {
+            // set error message to error from DB if that point fails.
+            error = e.toString();
+
+            ret = {error:error, refreshedToken: refreshedToken};
+            res.status(404).json(ret);
+        }
+	});
+	
+    // *****************
+    // End of deleteSet API
+    // *****************
+
+    //getPBs API
+    //agets the 
+	app.post('/api/getPBs', async(req, res, next) => {		
+		// incoming: login, jwtToken
+		// outgoing: personalBests
+
+        // error codes;
+        // 200 - normal operation
+        // 401 - expired token
+        // 404 - DB call failure
+		
+		var error = '';
+        const {login, jwtToken} = req.body;
+
+        const db = client.db("LargeProject");
+
+        // Check to see if token is expired, return error if so
+        try
+        {
+            if( token.isExpired(jwtToken))
+            {
+                var r = {error:'The JWT is no longer valid', jwtToken: ''};
+                res.status(401).json(r);
+                return;
+            }
+        }
+        catch(e)
+        {
+            console.log(e.message);
+        }
+
+        // refresh the token if prev. token not expired
+        let refreshedToken = null;
+        try
+        {
+            refreshedToken = token.refresh(jwtToken);
+        }
+        catch(e)
+        {
+            console.log(e.message);
+        }
+
+        const results = await db.collection('userInfo').find({login: login}).toArray();
+
+        // create json outgoing payload object
+        let ret = {};
+
+        try {
+            if(results.length > 0) {
+                if(results[0].hasExercises.length > 0) {
+                    var personalBests = [];
+
+                    for(var i = 0; i < results[0].hasExercises.length; i++) {
+                        personalBests[i] = personalBests[0].hasExercises[i].exerciseName + ": " + personalBests[0].hasExercises[i].personalBest;
+                    }
+                    ret = {personalBests: personalBests, refreshedToken: refreshedToken}
+                    res.status(200).json(ret);
+                } else {
+                    throw "No Personal Bests";
+                }
+               
+            } else {
+                throw "No Such User";
+            }
+
+        } catch (e) {
+            // set error message to error from DB if that point fails.
+            error = e.toString();
+
+            ret = {error:error, refreshedToken};
+            res.status(404).json(ret);
+        }
+	});
+	
+    // *****************
+    // End of getPBs API
+    // *****************
 }
