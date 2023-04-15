@@ -160,6 +160,85 @@ exports.setApp = function (app, client)
     // End of addUserInfo API
     // **********************
 
+    const nodemailer = require('nodemailer');
+    const { v4: uuidv4 } = require('uuid');
+    const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'workoutappgroup9@gmail.com',
+        pass: 'College2024!'
+    },
+    });
+
+    //sendEmail API
+    //Endpoint to initiate the email verification process
+    app.post('/api/sendEmail', (req, res) => {
+        const { email } = req.body;
+        // Generate a verification code
+        const verificationCode = uuidv4();
+
+         // Send the verification code to the user's email address
+         transporter.sendMail({
+             to: req.body.email,
+            subject: 'Email Verification Code',
+            text: `Your email verification code is: ${verificationCode}`,
+        }, (error, info) => {
+            if (error) {
+                console.log(error);
+               res.status(500).send('Error sending email');
+             } else {
+                console.log('Email sent: ' + info.response);
+
+                // Store the verification code in the database or cache
+                // associated with the user's email address for later verification
+
+                // Return a success response to the client
+                res.status(200).send('Verification email sent');
+            }
+        });
+    });
+
+    // ********************************
+    // End of sendEmail API
+    // ********************************
+
+    // verifyEmail API
+    // Checks if the User has inputted the correct verification code
+    app.post('/api/verifyEmail', async (req, res) => {
+        const { email, verificationCode } = req.body;
+      
+        try {
+            // Find the user in the database by email
+            const db = client.db("LargeProject");
+            const user = await db.collection('userInfo').find({email: email}).toArray();
+      
+            // Check if the verification code matches the one stored in the user object
+            if(user.length > 0) {
+                if (user[0].vCode === verificationCode) {
+
+                    // Set the verified status to true and save the user object
+                    await db.collection('userInfo').updateOne({"email": email}, {$set: {validated : true}});
+                    
+                    res.status(200).json("Validated");
+                } else {
+                    
+                    // Return an error if the verification code is invalid
+                    res.status(400).json({ message: "Invalid Verification Code"});
+                }
+            } else {
+                throw "No Such User";
+            }
+            
+        } catch (e) {
+            error = e.toString();
+            res.status(404).json({ error: error });
+        }
+    });
+
+    // ********************************
+    // End of verifyEmail API
+    // ********************************
+
     // createExercise API
     // User adds an Exercise to their Database
     app.post('/api/createExercise', async (req, res, next) => {
