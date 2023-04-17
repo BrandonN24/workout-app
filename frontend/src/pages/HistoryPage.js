@@ -1,16 +1,16 @@
 import React from 'react';
 import NavBar from '../components/NavBar';
-import PageTitle from '../components/PageTitle';
+import History from '../components/History';
 
-const HomePage = () =>
+const HistoryPage = () =>
 {
 
     return(
       <div>
         <NavBar />
-        <PageTitle />
+        <History />
       </div>
     );
 };
 
-export default HomePage;
+export default HistoryPage;

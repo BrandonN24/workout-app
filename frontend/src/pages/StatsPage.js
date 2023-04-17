@@ -1,16 +1,16 @@
 import React from 'react';
 import NavBar from '../components/NavBar';
-import PageTitle from '../components/PageTitle';
+import Stats from '../components/Stats';
 
-const HomePage = () =>
+const StatsPage = () =>
 {
 
     return(
       <div>
         <NavBar />
-        <PageTitle />
+        <Stats />
       </div>
     );
 };
 
-export default HomePage;
+export default StatsPage;

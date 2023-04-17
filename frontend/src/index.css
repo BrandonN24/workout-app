@@ -22,6 +22,36 @@ body {
   border-radius: 20px;
 }
 
+
+nav{
+  background: #0e3c69;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+}
+
+ul{
+  display: flex;
+  list-style: none;
+  margin: 0px;
+  padding: 0px;
+}
+
+li{
+  margin-right: 10px;
+}
+
+a{
+  color: #fff;
+  text-decoration: none;
+  padding: 5px;
+}
+
+a:hover{
+  background-color: #555;
+}
+
 #loginDiv{
   padding:25px;
   margin: 0 auto;
