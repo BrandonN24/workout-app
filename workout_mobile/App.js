@@ -8,8 +8,6 @@ import Home from './components/screens/Home';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import NewExercise from './components/screens/NewExercise';
 import Profile from './components/screens/Profile';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Settings} from 'react-native/types';
 import AddUserInfo from './components/screens/AddUserInfo';
 import ValidateEmail from './components/screens/ValidateEmail';
 
@@ -22,7 +20,7 @@ const Tab = createBottomTabNavigator();
 
 function HomeTabs() {
   return (
-    <Tab.Navigator>
+    <Tab.Navigator screenOptions={{headerShown: false}}>
       <Tab.Screen name="Home" component={Home} />
       <Tab.Screen name="NewExercise" component={NewExercise} />
       <Tab.Screen name="Profile" component={Profile} />

@@ -9,6 +9,7 @@ import * as yup from 'yup';
 import NavigateButton from '../NavigateButton';
 import client from '../../api/client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import jwt_decode from 'jwt-decode';
 
 const Login = ({setLoggedInState}) => {
   const initialValues = {
@@ -34,22 +35,43 @@ const Login = ({setLoggedInState}) => {
 
   const handleLogin = async (values, formikActions) => {
     try {
-      const {data} = await client.post('/api/login', {...values});
-      console.log(data.id);
-      if (data.id != -1) {
-        console.log(data);
+      const {data: res} = await client.post('/api/login', {...values});
+
+      let storage = require('../../tokenStorage');
+      storage.storeToken(res);
+      await AsyncStorage.setItem('token', res.accessToken);
+      const decodedToken = jwt_decode(res.accessToken);
+      console.log(decodedToken);
+      if (decodedToken.id != -1) {
         //setLoggedIn(true);
         //setLoggedInState();
-        await AsyncStorage.setItem('data', JSON.stringify(data));
+        console.log('Stored token: ' + storage.retrieveToken);
+        var token = await AsyncStorage.getItem('token');
+        let sendID = {id: decodedToken.id, jwtToken: token};
+        let jsIdObj = JSON.stringify(sendID);
+        console.log(jsIdObj);
+        // const userInfo = await client.post('/api/getUserInfo', {
+        //   method: 'POST',
+        //   body: jsIdObj,
+        //   headers: {'Content-Type': 'application/json'},
+        // });
+
+        //console.log(userInfo);
+        await AsyncStorage.setItem('data', JSON.stringify(decodedToken));
         console.log('Logged in set to true');
-        if (data.validated == false) {
-          navigation.navigate('ValidateEmail');
-        }
-        if (data.height == null && data.age == null && data.weight == null) {
-          navigation.navigate('AddUserInfo');
-        } else {
-          navigation.navigate('HomeScreen');
-        }
+
+        // if (decodedToken.validated == false) {
+        //   navigation.navigate('ValidateEmail');
+        // }
+        // if (
+        //   decodedToken.height == null &&
+        //   decodedToken.age == null &&
+        //   decodedToken.weight == null
+        // ) {
+        //   navigation.navigate('AddUserInfo');
+        // } else {
+        navigation.navigate('HomeScreen');
+        //}
       }
       formikActions.resetForm();
       formikActions.setSubmitting(false);
