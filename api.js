@@ -1008,7 +1008,7 @@ exports.setApp = function (app, client)
 	//addSet API
     //adds a set to an exercise in the exerciseInfo DB, not the workoutInfo DB
 	app.post('/api/addSet', async(req, res, next) => {		
-		// incoming: exercise name, login, weight, reps, effort, jwtToken
+		// incoming: exercise name, login, weight, reps, jwtToken
 		// outgoing: the set added, error, refreshedToken
 		
         // error codes:
@@ -1018,7 +1018,7 @@ exports.setApp = function (app, client)
 
 		var error = '';
         var temp = '';
-        const { eName, login, effort, reps, weight, jwtToken } = req.body;
+        const { eName, login, reps, weight, jwtToken } = req.body;
 
         // Check to see if token is expired, return error if so
         try
@@ -1062,7 +1062,6 @@ exports.setApp = function (app, client)
         try {
             if(results.length > 0) {
                 const newSet = {
-                    effort:effort,
                     reps:reps,
                     weight:weight
                 }
