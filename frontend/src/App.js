@@ -10,6 +10,8 @@ import AddInfoPage from './pages/AddInfoPage';
 import WorkoutsPage from './pages/WorkoutsPage';
 import HistoryPage from './pages/HistoryPage';
 import StatsPage from './pages/StatsPage';
+import ExerciseDetail from './pages/ExerciseDetail';
+
 
 function App() {
   return (
@@ -22,6 +24,8 @@ function App() {
       <Route path="/WorkoutsPage" index element={<WorkoutsPage />} />
       <Route path="/HistoryPage" index element={<HistoryPage />} />
       <Route path="/StatsPage" index element={<StatsPage />} />
+      <Route path="/exercise/:id" element={<ExerciseDetail />} />
+      
     </Routes>
   </BrowserRouter>
 );
