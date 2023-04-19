@@ -969,7 +969,7 @@ exports.setApp = function (app, client)
         res.status(200).json(ret);
     });
 
-    // removeExercise API
+    // removeExercise API (WIP)
     // removes a exercise from particular workout
     /*app.post('/api/removeExercise', async(req, res, next) => {
         // incoming: workout name, exercise name, login
