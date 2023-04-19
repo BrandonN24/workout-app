@@ -1,6 +1,7 @@
 import React from 'react';
 import NavBar from '../components/NavBar';
 import PageTitle from '../components/PageTitle';
+import HomeInfo from '../components/HomeInfo';
 
 const HomePage = () =>
 {
@@ -9,6 +10,7 @@ const HomePage = () =>
       <div>
         <NavBar />
         <PageTitle />
+        <HomeInfo />
       </div>
     );
 };
