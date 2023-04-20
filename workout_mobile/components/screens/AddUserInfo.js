@@ -17,7 +17,7 @@ const AddUserInfo = () => {
         const dataString = await AsyncStorage.getItem('data');
         const data = JSON.parse(dataString);
         setLoginData(data);
-        console.log(loginData.login);
+        //console.log(loginData.login);
         setLoading(false);
       } catch (error) {
         console.log(error);
@@ -41,7 +41,7 @@ const AddUserInfo = () => {
 
   const handleUserInfo = async (values, formikActions) => {
     try {
-      console.log(loginData.login);
+      //console.log(loginData.login);
       const {data} = await client.post('/api/addUserInfo', {
         login: loginData.login,
         ...values,

@@ -12,7 +12,7 @@ const Home = ({navigation}) => {
     try {
       decodedToken = jwt_decode(token);
     } catch (err) {
-      console.error(err);
+      //console.error(err);
       decodedToken = {};
     }
     const workoutData = decodedToken.workouts || [];

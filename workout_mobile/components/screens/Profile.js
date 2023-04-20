@@ -1,14 +1,19 @@
-import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
+import {View, Text, Button} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 
-const Profile = () => {
+const ProfileScreen = ({}) => {
+  const navigation = useNavigation();
+  const handleSignOut = () => {
+    navigation.navigate('Login');
+  };
+
   return (
-    <View>
-      <Text>Profile</Text>
+    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+      <Text>Welcome to your profile!</Text>
+      <Button title="Sign Out" onPress={handleSignOut} />
     </View>
   );
 };
 
-export default Profile;
-
-const styles = StyleSheet.create({});
+export default ProfileScreen;

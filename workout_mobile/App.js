@@ -10,6 +10,7 @@ import NewExercise from './components/screens/NewExercise';
 import Profile from './components/screens/Profile';
 import AddUserInfo from './components/screens/AddUserInfo';
 import ValidateEmail from './components/screens/ValidateEmail';
+import FinishWorkout from './components/screens/FinishWorkout';
 
 const theme = {
   ...DefaultTheme,
@@ -51,7 +52,7 @@ const App = () => {
 
   const setLoggedInState = useCallback(() => {
     setLoggedIn(true);
-    console.log('Logged in set to true');
+    //console.log('Logged in set to true');
   }, [setLoggedIn]);
 
   const Stack = createStackNavigator();
@@ -81,6 +82,9 @@ const App = () => {
           <Stack.Screen
             name="ValidateEmail"
             component={ValidateEmail}></Stack.Screen>
+          <Stack.Screen
+            name="FinishWorkout"
+            component={FinishWorkout}></Stack.Screen>
         </Stack.Navigator>
       )}
     </NavigationContainer>

@@ -6,19 +6,25 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const NewExercise = () => {
   const [exercises, setExercises] = useState(['']);
+  const [editing, setEditing] = useState(false);
 
   const handleAddExercise = () => {
     if (exercises[exercises.length - 1] !== '') {
       setExercises([...exercises, '']);
     }
   };
-
+  const navigation = useNavigation();
   const handleStartWorkout = () => {
     // Send the exercises to the API endpoint using Express and MongoDB here
-    console.log('Exercises:', exercises);
+    const nonEmptyExercises = exercises.filter(exercise => exercise !== '');
+    console.log('Exercises:', nonEmptyExercises);
+    AsyncStorage.setItem('exerciseNames', JSON.stringify(nonEmptyExercises));
+    navigation.navigate('FinishWorkout');
   };
 
   const handleExerciseChange = (text, index) => {
@@ -27,25 +33,49 @@ const NewExercise = () => {
     setExercises(newExercises);
   };
 
+  const handleEdit = () => {
+    setEditing(!editing);
+  };
+
+  const handleDelete = index => {
+    const newExercises = [...exercises];
+    newExercises.splice(index, 1);
+    setExercises(newExercises);
+  };
+
   return (
     <View style={styles.container}>
+      <Text>Make A New Workout</Text>
+      <TextInput style={styles.headerInput} placeholder="Workout name" />
       <View style={styles.table}>
         {exercises.map((exercise, index) => (
-          <TextInput
-            key={index}
-            style={styles.input}
-            placeholder="Exercise name"
-            value={exercise}
-            onChangeText={text => handleExerciseChange(text, index)}
-          />
+          <View style={styles.row} key={index}>
+            {editing && (
+              <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={() => handleDelete(index)}>
+                <Text style={styles.deleteButtonText}>Delete</Text>
+              </TouchableOpacity>
+            )}
+            <TextInput
+              style={styles.input}
+              placeholder="Exercise name"
+              value={exercise}
+              onChangeText={text => handleExerciseChange(text, index)}
+            />
+          </View>
         ))}
       </View>
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={handleAddExercise}>
           <Text style={styles.buttonText}>Add new exercise name</Text>
         </TouchableOpacity>
+
         <TouchableOpacity style={styles.button} onPress={handleStartWorkout}>
           <Text style={styles.buttonText}>Start workout</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.editButton} onPress={handleEdit}>
+          <Text style={styles.buttonText}>{editing ? 'Done' : 'Edit'}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -85,6 +115,36 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+  editButton: {
+    backgroundColor: 'orange',
+    padding: 10,
+    borderRadius: 5,
+    flex: 1,
+    marginHorizontal: 5,
+  },
+  editButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  deleteButtonText: {
+    color: 'black',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  headerInput: {
+    height: 40,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    marginBottom: 10,
+    paddingHorizontal: 10,
   },
 });
 

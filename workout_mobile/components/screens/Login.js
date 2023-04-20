@@ -45,7 +45,7 @@ const Login = ({setLoggedInState}) => {
       if (decodedToken.id != -1) {
         //setLoggedIn(true);
         //setLoggedInState();
-        console.log('Stored token: ' + storage.retrieveToken);
+        //console.log('Stored token: ' + storage.retrieveToken);
         var token = await AsyncStorage.getItem('token');
         let sendID = {id: decodedToken.id, jwtToken: token};
         let jsIdObj = JSON.stringify(sendID);
@@ -57,7 +57,7 @@ const Login = ({setLoggedInState}) => {
         // });
 
         //console.log(userInfo);
-        await AsyncStorage.setItem('data', JSON.stringify(decodedToken));
+        //await AsyncStorage.setItem('data', JSON.stringify(decodedToken));
         console.log('Logged in set to true');
 
         // if (decodedToken.validated == false) {
