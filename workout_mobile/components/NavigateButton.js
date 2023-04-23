@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
   submit: {
     width: width - 40,
     height: 50,
-    backgroundColor: '#8469cf',
+    backgroundColor: '#3C6E71',
     borderRadius: 8,
     marginBottom: 20,
     justifyContent: 'center',

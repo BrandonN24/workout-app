@@ -9,7 +9,7 @@ const SubmitButton = ({title}) => {
       onPress={isSubmitting ? null : handleSubmit}
       style={[
         styles.submit,
-        {backgroundColor: isSubmitting ? 'gray' : '#8469cf'},
+        {backgroundColor: isSubmitting ? 'gray' : '#3C6E71'},
       ]}>
       <Text style={styles.btnText}>{title}</Text>
     </Pressable>

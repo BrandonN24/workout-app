@@ -50,14 +50,10 @@ const Login = ({setLoggedInState}) => {
         let sendID = {id: decodedToken.id, jwtToken: token};
         let jsIdObj = JSON.stringify(sendID);
         console.log(jsIdObj);
-        // const userInfo = await client.post('/api/getUserInfo', {
-        //   method: 'POST',
-        //   body: jsIdObj,
-        //   headers: {'Content-Type': 'application/json'},
-        // });
+        //const userInfo = await client.post('/api/getUserInfo', {...jsIdObj});
 
         //console.log(userInfo);
-        //await AsyncStorage.setItem('data', JSON.stringify(decodedToken));
+        //await AsyncStorage.setItem('data', JSON.stringify(userInfo));
         console.log('Logged in set to true');
 
         // if (decodedToken.validated == false) {
@@ -86,6 +82,7 @@ const Login = ({setLoggedInState}) => {
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={handleLogin}>
+        <Text style={styles.title}>UCF Fitness</Text>
         <AppInput name="login" placeholder="Username" />
         <AppInput secureTextEntry name="password" placeholder="Password" />
         <SubmitButton title="Log In" />
@@ -97,6 +94,14 @@ const Login = ({setLoggedInState}) => {
 
 const styles = StyleSheet.create({
   container: {},
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginTop: 16,
+    marginBottom: 8,
+    color: '#353535',
+  },
 });
 
 export default Login;
