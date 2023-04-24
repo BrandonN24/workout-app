@@ -9,7 +9,7 @@ const NavBar = () => {
             Home
             </Link>
           <Link to="/WorkoutsPage">
-            Workouts
+            Exercises
           </Link>
           <Link to="/HistoryPage">
             History
