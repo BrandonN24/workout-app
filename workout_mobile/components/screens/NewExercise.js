@@ -45,8 +45,10 @@ const NewExercise = () => {
 
   return (
     <View style={styles.container}>
-      <Text>Make A New Workout</Text>
-      <TextInput style={styles.headerInput} placeholder="Workout name" />
+      <View style={styles.header}>
+        <Text style={styles.headerText}>Make A New Workout</Text>
+        <TextInput style={styles.headerInput} placeholder="Workout name" />
+      </View>
       <View style={styles.table}>
         {exercises.map((exercise, index) => (
           <View style={styles.row} key={index}>
@@ -68,13 +70,13 @@ const NewExercise = () => {
       </View>
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={handleAddExercise}>
-          <Text style={styles.buttonText}>Add new exercise name</Text>
+          <Text style={styles.buttonText}>New Exercise</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.button} onPress={handleStartWorkout}>
           <Text style={styles.buttonText}>Start workout</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.editButton} onPress={handleEdit}>
+        <TouchableOpacity style={styles.button} onPress={handleEdit}>
           <Text style={styles.buttonText}>{editing ? 'Done' : 'Edit'}</Text>
         </TouchableOpacity>
       </View>
@@ -86,11 +88,24 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
+  },
+  header: {
+    flexDirection: 'column',
+    alignItems: 'stretch',
+  },
+  headerText: {
+    color: 'black',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
   table: {
     flexDirection: 'column',
     alignItems: 'stretch',
+    borderWidth: 1,
+    borderColor: 'black',
+    borderStyle: 'solid',
+    borderRadius: 9,
   },
   input: {
     height: 40,
@@ -99,36 +114,32 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingHorizontal: 10,
   },
+  borderedInput: {
+    height: 40,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    marginBottom: 10,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+    backgroundColor: '#f9f9f9',
+    padding: 5,
+  },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 20,
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 20,
   },
   button: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#3C6E71',
     padding: 10,
     borderRadius: 5,
     flex: 1,
     marginHorizontal: 5,
   },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  editButton: {
-    backgroundColor: 'orange',
-    padding: 10,
-    borderRadius: 5,
-    flex: 1,
-    marginHorizontal: 5,
-  },
-  editButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-
   buttonText: {
     color: 'white',
     fontWeight: 'bold',
