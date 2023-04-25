@@ -3,7 +3,11 @@ import React from 'react';
 function PageTitle()
 {
    return(
-     <h1 id="title">Workout App</h1>
+    <body>
+      <h1 id="title">UCFitness App</h1>
+    </body>
+     
+    
    );
 };
 

@@ -57,6 +57,8 @@ function Login()
                 let sendID = {id: decodedToken.id , jwtToken: storage.retrieveToken()};
                 let jsIdObj = JSON.stringify(sendID);
 
+                console.log(jsIdObj);
+                
                 // make a call to get userInfo
                 const infoRequest = await fetch(bp.buildPath('api/getUserInfo'),
                 {method:'POST',body:jsIdObj,headers:{'Content-Type': 'application/json'}});
