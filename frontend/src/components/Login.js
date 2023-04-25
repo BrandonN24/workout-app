@@ -65,14 +65,24 @@ function Login()
                 let userInfo = JSON.parse(await infoRequest.text());
                 localStorage.setItem('user_data', JSON.stringify(userInfo));
 
-                // if age is an invalid value, then send user to addInfoPage.
-                if(userInfo.age == -1)
+                // If user has not been email verified, then send them to the email verification page
+                if(!userInfo.validated)
                 {
-                    window.location.href = '/AddInfoPage';    
+                    window.location.href = '/EmailVerificationPage';
                 }
-                else{
-                    window.location.href = '/HomePage';
-                }    
+                // otherwise, user has been email verified
+                else
+                {
+                    // if age is an invalid value, then send user to addInfoPage.
+                    if(userInfo.age == -1)
+                    {
+                        window.location.href = '/AddInfoPage';    
+                    }
+                    else{
+                        window.location.href = '/HomePage';
+                    }   
+                }
+                 
             }
         }
         catch(e)

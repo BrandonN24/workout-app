@@ -11,6 +11,7 @@ import WorkoutsPage from './pages/WorkoutsPage';
 import HistoryPage from './pages/HistoryPage';
 import StatsPage from './pages/StatsPage';
 import ExerciseDetail from './pages/ExerciseDetail';
+import EmailVerificationPage from './pages/EmailVerificationPage';
 
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
       <Route path="/HistoryPage" index element={<HistoryPage />} />
       <Route path="/StatsPage" index element={<StatsPage />} />
       <Route path="/exercise/:id" element={<ExerciseDetail />} />
+      <Route path="/EmailVerificationPage" index element={<EmailVerificationPage />} />
       
     </Routes>
   </BrowserRouter>

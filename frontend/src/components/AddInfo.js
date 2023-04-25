@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import {useJwt, isExpired, decodeToken} from "react-jwt";
 
 function AddInfo()
 {
@@ -18,13 +19,15 @@ function AddInfo()
         const heightVal = parseInt(addHeight.value);
         const weightVal = parseInt(addWeight.value);
 
+        let token = storage.retrieveToken();
+
         var temp = 
         {
-            login:userID.login,
+            login: decodeToken(token).login,
             age:ageVal,
             height:heightVal,
             weight:weightVal,
-            jwtToken: storage.retrieveToken()
+            jwtToken: token
         };
 
         var js = JSON.stringify(temp);
