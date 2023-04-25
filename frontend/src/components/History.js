@@ -1,84 +1,72 @@
 import React, { useState } from 'react';
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
 
 function History() {
   const [date, setDate] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [workouts, setWorkouts] = useState([]);
+  const [error, setError] = useState(null);
 
-  const handlePrevClick = () => {
-    const prevMonth = new Date(date.getFullYear(), date.getMonth() - 1);
-    setDate(prevMonth);
+  const userID = JSON.parse(localStorage.getItem("user_data"));
+
+  const handleDateChange = async (date) => {
+    setDate(date);
+    const formattedDate = date.toLocaleDateString('en-US', { 
+      month: '2-digit', 
+      day: '2-digit', 
+      year: 'numeric' 
+    }).replace(/\//g, '/');
+    const response = await fetchWorkouts(formattedDate);
+    if (response.ok) {
+      setWorkouts(response.data.workouts);
+      setError(null);
+    } else {
+      setError(response.data.error);
+    }
   };
 
-  const handleNextClick = () => {
-    const nextMonth = new Date(date.getFullYear(), date.getMonth() + 1);
-    setDate(nextMonth);
+  const fetchWorkouts = async (date) => {
+    try {
+      console.log('date is',date,'login is', 'DerekA');
+
+      var obj = {login:'DerekA',date: date};
+      var js = JSON.stringify(obj);
+
+      var bp = require('./Path.js');
+      const response = await fetch(bp.buildPath('api/workoutByDate'),
+          {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
+
+      const data = await response.json();
+      console.log(data);
+      return {ok: response.ok, data};
+    } catch (error) {
+      setError('Unable to fetch workouts');
+      return {ok: false, data: {error: 'Unable to fetch workouts'}};
+    }
   };
-
-  const handleDateClick = (day) => {
-    setSelectedDate(day);
-  };
-
-  const monthName = date.toLocaleDateString(undefined, { month: 'long' });
-  const year = date.getFullYear();
-
-  const daysInMonth = new Date(year, date.getMonth() + 1, 0).getDate();
-  const firstDayOfMonth = new Date(year, date.getMonth(), 1).getDay();
-
-  const days = [];
-  for (let i = 1; i <= daysInMonth; i++) {
-    days.push(i);
-  }
 
   return (
-   <div>
-    <h1 id="title">History</h1>
-    <div className='calendar'> 
-      <h2>{monthName} {year}</h2>
-      <div>
-        <button onClick={handlePrevClick}>Prev</button>
-        <button onClick={handleNextClick}>Next</button>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Sun</th>
-            <th>Mon</th>
-            <th>Tue</th>
-            <th>Wed</th>
-            <th>Thu</th>
-            <th>Fri</th>
-            <th>Sat</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Array(Math.ceil((daysInMonth + firstDayOfMonth) / 7)).fill().map((_, weekIndex) => (
-            <tr key={weekIndex}>
-              {Array(7).fill().map((_, dayIndex) => {
-                const dayNumber = (weekIndex * 7) + dayIndex + 1 - firstDayOfMonth;
-                return (
-                  <td key={dayIndex}>
-                    {dayNumber > 0 && dayNumber <= daysInMonth && (
-                      <div>
-                        <button onClick={() => handleDateClick(dayNumber)}>{dayNumber}</button>
-                        {selectedDate === dayNumber && (
-                          <div>
-                            Information for {monthName} {dayNumber}, {year}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div>
+      <h1>Workout Calendar</h1>
+      <Calendar
+        onChange={handleDateChange}
+        value={date}
+      />
+      {error && <div>{error}</div>}
+      {workouts.length > 0 && (
+        <div>
+          <h2>Workouts on {date.toLocaleDateString()}</h2>
+          <ul>
+            {workouts.map(workout => (
+              <li key={workout._id}>
+                {workout.exercise} - {workout.weight} lbs x {workout.reps}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
-    </div> 
   );
 }
 
 export default History;
-
-
