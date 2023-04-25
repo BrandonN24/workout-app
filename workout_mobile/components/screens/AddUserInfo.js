@@ -7,10 +7,13 @@ import * as yup from 'yup';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SubmitButton from '../SubmitButton';
 import client from '../../api/client';
+import jwt_decode from 'jwt-decode';
+import {useNavigation} from '@react-navigation/native';
 
 const AddUserInfo = () => {
   const [loginData, setLoginData] = React.useState({});
   const [loading, setLoading] = React.useState(true);
+  const navigation = useNavigation();
   React.useEffect(() => {
     const fetchData = async () => {
       try {
@@ -41,11 +44,21 @@ const AddUserInfo = () => {
 
   const handleUserInfo = async (values, formikActions) => {
     try {
-      //console.log(loginData.login);
-      const {data} = await client.post('/api/addUserInfo', {
-        login: loginData.login,
+      let token = await AsyncStorage.getItem('token');
+      const decodedToken = jwt_decode(token);
+      let data = await AsyncStorage.getItem('data');
+      data = JSON.parse(data);
+      //console.log(decodedToken);
+      let sendID = {
+        login: decodedToken.login,
         ...values,
+        jwtToken: token,
+      };
+      console.log(sendID);
+      const {addInfo} = await client.post('/api/addUserInfo', {
+        ...sendID,
       });
+      console.log(addInfo);
       navigation.navigate('HomeScreen');
     } catch (error) {
       console.log(error);

@@ -10,6 +10,7 @@ import NavigateButton from '../NavigateButton';
 import client from '../../api/client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import jwt_decode from 'jwt-decode';
+import {parse} from 'dotenv';
 
 const Login = ({setLoggedInState}) => {
   const initialValues = {
@@ -49,25 +50,40 @@ const Login = ({setLoggedInState}) => {
         var token = await AsyncStorage.getItem('token');
         let sendID = {id: decodedToken.id, jwtToken: token};
         let jsIdObj = JSON.stringify(sendID);
-        console.log(jsIdObj);
-        //const userInfo = await client.post('/api/getUserInfo', {...jsIdObj});
-
-        //console.log(userInfo);
-        //await AsyncStorage.setItem('data', JSON.stringify(userInfo));
+        //console.log(jsIdObj);
+        const parsedIdObj = JSON.parse(jsIdObj);
+        const infoRequest = await client.post('/api/getUserInfo', {
+          ...parsedIdObj,
+        });
+        console.log(infoRequest.data);
+        await AsyncStorage.setItem('data', JSON.stringify(infoRequest.data));
+        //await AsyncStorage.removeItem('token');
+        console.log(infoRequest.data.jwtToken.accessToken);
+        await AsyncStorage.setItem(
+          'token',
+          infoRequest.data.jwtToken.accessToken,
+        );
         console.log('Logged in set to true');
 
-        // if (decodedToken.validated == false) {
-        //   navigation.navigate('ValidateEmail');
-        // }
-        // if (
-        //   decodedToken.height == null &&
-        //   decodedToken.age == null &&
-        //   decodedToken.weight == null
-        // ) {
-        //   navigation.navigate('AddUserInfo');
-        // } else {
-        navigation.navigate('HomeScreen');
-        //}
+        if (infoRequest.data.validated == false) {
+          var token = await AsyncStorage.getItem('token');
+          let sendID = {email: infoRequest.data.email, jwtToken: token};
+          let jsIdObj = JSON.stringify(sendID);
+          const parsedIdObj = JSON.parse(jsIdObj);
+          const sendEmail = await client.post('/api/sendEmail', {
+            ...parsedIdObj,
+          });
+          console.log(sendEmail);
+          navigation.navigate('ValidateEmail');
+        } else if (
+          infoRequest.data.height == -1 &&
+          infoRequest.data.age == -1 &&
+          infoRequest.data.weight == -1
+        ) {
+          navigation.navigate('AddUserInfo');
+        } else {
+          navigation.navigate('HomeScreen');
+        }
       }
       formikActions.resetForm();
       formikActions.setSubmitting(false);
