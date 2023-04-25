@@ -666,7 +666,7 @@ exports.setApp = function (app, client)
 
         const db = client.db("LargeProject");
 
-		const { name, login, jwtToken } = req.body;
+		const { name, date, login, jwtToken } = req.body;
 
         // Check to see if token is expired, return error if so
         try {
@@ -704,13 +704,12 @@ exports.setApp = function (app, client)
             }
             res.status(400).json(ret);
         } else {
-            var tempDate = new Date();
-            tempDate.setUTCFullYear(1999, 12, 31);
+
             
             const newWorkout = {
                 name: name,
                 public: temp,
-                dateDone: tempDate,
+                dateDone: date,
                 caloriesBurned: -1,
                 duration: -1,
                 exercises: []
@@ -879,6 +878,84 @@ exports.setApp = function (app, client)
     // END OF SEARCHWORKOUT API
     // ********************************
 
+    //addToWorkout API
+    //adds an exercise to a workout in the workoutInfo DB
+	app.post('/api/addToWorkout', async(req, res, next) => {		
+		// incoming: login, wName, eName, calories burned, calories per rep
+		// outgoing: none
+		
+        // error codes:
+        // 401 - expired token
+        // 200 - normal operation
+        // 404 - something went wrong with DB update call
+
+		var error = '';
+        var temp = '';
+        const { login, wName, eName, calBurn, calPR } = req.body;
+
+        // Check to see if token is expired, return error if so
+        /*try {
+            if( token.isExpired(jwtToken)) {
+                var r = {error:'The JWT is no longer valid', jwtToken: ''};
+                res.status(401).json(r);
+                return;
+            }
+        } catch(e) {
+            console.log(e.message);
+        }
+
+        // refresh the token if prev. token not expired
+        let refreshedToken = null;
+        try {
+            refreshedToken = token.refresh(jwtToken);
+        } catch(e) {
+            console.log(e.message);
+        }*/
+
+        const db = client.db("LargeProject");
+
+        if(login.toLowerCase() == "public") {
+            temp = login.toLowerCase();
+        } else {
+            temp = login;
+        }
+
+        const workoutExists = await db.collection('workoutInfo').find({name: wName, public: temp}).toArray();
+
+        // create json outgoing payload object
+        let ret = {};
+
+        try {
+            if(workoutExists.length > 0) {
+
+                const newExercise = {
+                    Name: eName,
+                    Sets: [],
+                    caloriesBurned: calBurn,
+                    Public: temp,
+                    caloriesPerRep: calPR
+                }
+
+                await db.collection('workoutInfo').updateOne({name:wName, public: temp}, {$push: {exercises: newExercise}});
+
+                ret = {newExercise: newExercise, error: error/*, refreshedToken: refreshedToken*/};
+                res.status(200).json(ret);
+            } else {
+                throw "No Such Workout";
+            }
+
+        } catch (e) {
+            // set error message to error from DB if that point fails.
+            error = e.toString();
+
+            ret = {error:error/*, refreshedToken: refreshedToken*/};
+            res.status(404).json(ret);
+        }
+	});
+    // *****************
+    // END OF ADDTOWORKOUT API
+    // *****************
+
     // removeExercise API (WIP)
     // removes a exercise from particular workout
     /*app.post('/api/removeExercise', async(req, res, next) => {
@@ -911,7 +988,6 @@ exports.setApp = function (app, client)
             res.status(404).json(ret);
         }
     });*/
-
     // ********************************
     // End of removeExercise API
     // ********************************
@@ -1187,5 +1263,77 @@ exports.setApp = function (app, client)
 	});	
     // *****************
     // END OF WORKOUTBYDATE API
+    // *****************
+
+    //weightByDate API
+    //gets the user's personal bests for all exercise where they have one
+	app.post('/api/weightByDate', async(req, res, next) => {		
+		// incoming: login, exercise
+		// outgoing: highest weight done for a given exercise by date
+
+        // error codes;
+        // 200 - normal operation
+        // 401 - expired token
+        // 404 - DB call failure
+		
+		var error = '';
+        const {login, eName} = req.body;
+
+        const db = client.db("LargeProject");
+/*
+        // Check to see if token is expired, return error if so
+        try {
+            if( token.isExpired(jwtToken)) {
+                var r = {error:'The JWT is no longer valid', jwtToken: ''};
+                res.status(401).json(r);
+                return;
+            }
+        } catch(e) {
+            console.log(e.message);
+        }
+
+        // refresh the token if prev. token not expired
+        let refreshedToken = null;
+        try {
+            refreshedToken = token.refresh(jwtToken);
+        } catch(e) {
+            console.log(e.message);
+        }
+*/
+        const userExists = await db.collection('userInfo').find({login: login}).toArray();
+
+        // create json outgoing payload object
+        let ret = {};
+
+        try {
+            if(userExists.length > 0) {
+                const workouts = await db.collection('workoutInfo').find({public: login}).toArray();
+
+                for(var i = 0; i < workouts.length; i++) {
+                    const exercises = workouts[i].exercises;
+
+                    for(var j = 0; j < exercises.length; j++) {
+                        console.log(exercises[j].Name);
+                        /*if(exercises[j].Name == eName) {
+
+                        }*/
+                    }
+                }
+
+                ret = {workouts: result};
+                res.status(200).json(ret);
+            } else {
+                throw "No Such User";
+            }
+        } catch (e) {
+            // set error message to error from DB if that point fails.
+            error = e.toString();
+
+            ret = {error:error/*, refreshedToken*/};
+            res.status(404).json(ret);
+        }
+	});	
+    // *****************
+    // END OF WEIGHTBYDATE API
     // *****************
 }
