@@ -1147,6 +1147,67 @@ exports.setApp = function (app, client)
         } catch(e) {
             console.log(e.message);
         }
+
+        // refresh the token if prev. token not expired
+        let refreshedToken = null;
+        try {
+            refreshedToken = token.refresh(jwtToken);
+        } catch(e) {
+            console.log(e.message);
+        }
+*/
+        const results = await db.collection('userInfo').find({login: login}).toArray();
+
+        // create json outgoing payload object
+        let ret = {};
+
+        try {
+            if(results.length > 0) {
+                const result = await db.collection('workoutInfo').find({dateDone: date}).toArray();
+
+                ret = {workouts: result};
+                res.status(200).json(ret);
+            } else {
+                throw "No Such User";
+            }
+        } catch (e) {
+            // set error message to error from DB if that point fails.
+            error = e.toString();
+
+            ret = {error:error/*, refreshedToken*/};
+            res.status(404).json(ret);
+        }
+	});	
+    // *****************
+    // END OF WORKOUTBYDATE API
+    // *****************
+
+    //workoutByDate API
+    //gets the user's personal bests for all exercise where they have one
+	app.post('/api/workoutByDate', async(req, res, next) => {		
+		// incoming: login, date
+		// outgoing: workouts according to the sent date
+
+        // error codes;
+        // 200 - normal operation
+        // 401 - expired token
+        // 404 - DB call failure
+		
+		var error = '';
+        const {login, date} = req.body;
+
+        const db = client.db("LargeProject");
+/*
+        // Check to see if token is expired, return error if so
+        try {
+            if( token.isExpired(jwtToken)) {
+                var r = {error:'The JWT is no longer valid', jwtToken: ''};
+                res.status(401).json(r);
+                return;
+            }
+        } catch(e) {
+            console.log(e.message);
+        }
         // refresh the token if prev. token not expired
         let refreshedToken = null;
         try {
