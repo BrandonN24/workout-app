@@ -59,6 +59,8 @@ exports.setApp = function (app, client)
         }
         else{
             ret = {id: id};
+            res.status(404).json(ret);
+            return;
         }
 
         
@@ -878,6 +880,7 @@ exports.setApp = function (app, client)
     // END OF SEARCHWORKOUT API
     // ********************************
 
+    
     //addToWorkout API
     //adds an exercise to a workout in the workoutInfo DB
 	app.post('/api/addToWorkout', async(req, res, next) => {		
@@ -929,28 +932,29 @@ exports.setApp = function (app, client)
             if(workoutExists.length > 0) {
 
                 var newExercise = {
-		    Name: eName[0],
-		    Sets: [],
-		    caloriesBurned: calBurn[0],
-		    Public: temp,
-		    caloriesPerRep: calPR[0]
-		}
+                    Name: eName[0],
+                    Sets: [],
+                    caloriesBurned: calBurn[0],
+                    Public: temp,
+                    caloriesPerRep: calPR[0]
+		        }
 
-		    for(int i = 0; i < num ; i++)
+		    for(i = 0; i < num; i++)
 		    {
-			newExercise = {
-			Name: eName[i],
-			Sets: [],
-			caloriesBurned: calBurn[i],
-			Public: temp,
-			caloriesPerRep: calPR[i]
-		    }
+                newExercise = {
+                    Name: eName[i],
+                    Sets: [],
+                    caloriesBurned: calBurn[i],
+                    Public: temp,
+                    caloriesPerRep: calPR[i]
+		        }
 					
-		    await db.collection('workoutInfo').updateOne({name:wName, public: temp}, {$push: {exercises: newExercise}});
-		}
+		        await db.collection('workoutInfo').updateOne({name:wName, public: temp}, {$push: {exercises: newExercise}});
+		    }
 
                 ret = {newExercise: newExercise, error: error/*, refreshedToken: refreshedToken*/};
                 res.status(200).json(ret);
+
             } else {
                 throw "No Such Workout";
             }
@@ -963,6 +967,7 @@ exports.setApp = function (app, client)
             res.status(404).json(ret);
         }
 	});
+
     // *****************
     // END OF ADDTOWORKOUT API
     // *****************
