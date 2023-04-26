@@ -880,6 +880,7 @@ exports.setApp = function (app, client)
     // END OF SEARCHWORKOUT API
     // ********************************
 
+    
     //addToWorkout API
     //adds an exercise to a workout in the workoutInfo DB
 	app.post('/api/addToWorkout', async(req, res, next) => {		
@@ -931,29 +932,29 @@ exports.setApp = function (app, client)
             if(workoutExists.length > 0) {
 
                 var newExercise = {
-                Name: eName[0],
-                Sets: [],
-                caloriesBurned: calBurn[0],
-                Public: temp,
-                caloriesPerRep: calPR[0]
-                }
+                    Name: eName[0],
+                    Sets: [],
+                    caloriesBurned: calBurn[0],
+                    Public: temp,
+                    caloriesPerRep: calPR[0]
+		        }
 
-		    for(int i = 0; i < num ; i++)
+		    for(i = 0; i < num; i++)
 		    {
-			newExercise = {
-			Name: eName[i],
-			Sets: [],
-			caloriesBurned: calBurn[i],
-			Public: temp,
-			caloriesPerRep: calPR[i]
-		    }
-            
+                newExercise = {
+                    Name: eName[i],
+                    Sets: [],
+                    caloriesBurned: calBurn[i],
+                    Public: temp,
+                    caloriesPerRep: calPR[i]
+		        }
 					
-		    await db.collection('workoutInfo').updateOne({name:wName, public: temp}, {$push: {exercises: newExercise}});
-		}
+		        await db.collection('workoutInfo').updateOne({name:wName, public: temp}, {$push: {exercises: newExercise}});
+		    }
 
                 ret = {newExercise: newExercise, error: error/*, refreshedToken: refreshedToken*/};
                 res.status(200).json(ret);
+
             } else {
                 throw "No Such Workout";
             }
@@ -966,6 +967,7 @@ exports.setApp = function (app, client)
             res.status(404).json(ret);
         }
 	});
+
     // *****************
     // END OF ADDTOWORKOUT API
     // *****************
@@ -975,20 +977,14 @@ exports.setApp = function (app, client)
     /*app.post('/api/removeExercise', async(req, res, next) => {
         // incoming: workout name, exercise name, login
         // outgoing: none
-
         var error = '';
-
         const { wName, eName, userName } = req.body;
-
         const db = client.db("LargeProject");
-
         const results = await db.collection('userInfo').find({login: userName}).toArray();
-
         try {
             if(!(results.length > 0)) {
                 throw "No Such User";
             }
-
             const result = await db.collection('workoutInfo').deleteOne({name: wName, public: userName}.{eName: eName});      
             
             var ret = {error:error};
@@ -996,7 +992,6 @@ exports.setApp = function (app, client)
         } catch(e) {
             // set error message to error from DB if that point fails.
             error = e.toString();
-
             // return error code 404, User not found
             var ret = {error:error};
             res.status(404).json(ret);
@@ -1349,5 +1344,30 @@ exports.setApp = function (app, client)
 	});	
     // *****************
     // END OF WEIGHTBYDATE API
+    // *****************
+}
+
+        // create json outgoing payload object
+        let ret = {};
+
+        try {
+            if(results.length > 0) {
+                const result = await db.collection('workoutInfo').find({dateDone: date}).toArray();
+
+                ret = {workouts: result};
+                res.status(200).json(ret);
+            } else {
+                throw "No Such User";
+            }
+        } catch (e) {
+            // set error message to error from DB if that point fails.
+            error = e.toString();
+
+            ret = {error:error/*, refreshedToken*/};
+            res.status(404).json(ret);
+        }
+	});	
+    // *****************
+    // END OF WORKOUTBYDATE API
     // *****************
 }
