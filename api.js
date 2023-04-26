@@ -906,7 +906,6 @@ exports.setApp = function (app, client)
         } catch(e) {
             console.log(e.message);
         }
-
         // refresh the token if prev. token not expired
         let refreshedToken = null;
         try {
@@ -1239,7 +1238,6 @@ exports.setApp = function (app, client)
         } catch(e) {
             console.log(e.message);
         }
-
         // refresh the token if prev. token not expired
         let refreshedToken = null;
         try {
@@ -1300,7 +1298,6 @@ exports.setApp = function (app, client)
         } catch(e) {
             console.log(e.message);
         }
-
         // refresh the token if prev. token not expired
         let refreshedToken = null;
         try {
@@ -1324,7 +1321,6 @@ exports.setApp = function (app, client)
                     for(var j = 0; j < exercises.length; j++) {
                         console.log(exercises[j].Name);
                         /*if(exercises[j].Name == eName) {
-
                         }*/
                     }
                 }
@@ -1344,30 +1340,5 @@ exports.setApp = function (app, client)
 	});	
     // *****************
     // END OF WEIGHTBYDATE API
-    // *****************
-}
-
-        // create json outgoing payload object
-        let ret = {};
-
-        try {
-            if(results.length > 0) {
-                const result = await db.collection('workoutInfo').find({dateDone: date}).toArray();
-
-                ret = {workouts: result};
-                res.status(200).json(ret);
-            } else {
-                throw "No Such User";
-            }
-        } catch (e) {
-            // set error message to error from DB if that point fails.
-            error = e.toString();
-
-            ret = {error:error/*, refreshedToken*/};
-            res.status(404).json(ret);
-        }
-	});	
-    // *****************
-    // END OF WORKOUTBYDATE API
     // *****************
 }
