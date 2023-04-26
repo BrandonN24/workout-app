@@ -37,7 +37,7 @@ const Login = ({setLoggedInState}) => {
   const handleLogin = async (values, formikActions) => {
     try {
       const {data: res} = await client.post('/api/login', {...values});
-
+//
       let storage = require('../../tokenStorage');
       storage.storeToken(res);
       await AsyncStorage.setItem('token', res.accessToken);
