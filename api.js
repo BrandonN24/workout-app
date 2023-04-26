@@ -59,6 +59,8 @@ exports.setApp = function (app, client)
         }
         else{
             ret = {id: id};
+            res.status(404).json(ret);
+            return;
         }
 
         
@@ -929,12 +931,12 @@ exports.setApp = function (app, client)
             if(workoutExists.length > 0) {
 
                 var newExercise = {
-		    Name: eName[0],
-		    Sets: [],
-		    caloriesBurned: calBurn[0],
-		    Public: temp,
-		    caloriesPerRep: calPR[0]
-		}
+                Name: eName[0],
+                Sets: [],
+                caloriesBurned: calBurn[0],
+                Public: temp,
+                caloriesPerRep: calPR[0]
+                }
 
 		    for(int i = 0; i < num ; i++)
 		    {
@@ -945,6 +947,7 @@ exports.setApp = function (app, client)
 			Public: temp,
 			caloriesPerRep: calPR[i]
 		    }
+            
 					
 		    await db.collection('workoutInfo').updateOne({name:wName, public: temp}, {$push: {exercises: newExercise}});
 		}
