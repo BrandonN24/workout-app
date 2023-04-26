@@ -891,7 +891,7 @@ exports.setApp = function (app, client)
 
 		var error = '';
         var temp = '';
-        const { login, wName, eName, calBurn, calPR } = req.body;
+        const { login, wName, eName, calBurn, calPR, num } = req.body;
 
         // Check to see if token is expired, return error if so
         /*try {
@@ -928,15 +928,26 @@ exports.setApp = function (app, client)
         try {
             if(workoutExists.length > 0) {
 
-                const newExercise = {
-                    Name: eName,
-                    Sets: [],
-                    caloriesBurned: calBurn,
-                    Public: temp,
-                    caloriesPerRep: calPR
-                }
+                var newExercise = {
+		    Name: eName[0],
+		    Sets: [],
+		    caloriesBurned: calBurn[0],
+		    Public: temp,
+		    caloriesPerRep: calPR[0]
+		}
 
-                await db.collection('workoutInfo').updateOne({name:wName, public: temp}, {$push: {exercises: newExercise}});
+		    for(int i = 0; i < num ; i++)
+		    {
+			newExercise = {
+			Name: eName[i],
+			Sets: [],
+			caloriesBurned: calBurn[i],
+			Public: temp,
+			caloriesPerRep: calPR[i]
+		    }
+					
+		    await db.collection('workoutInfo').updateOne({name:wName, public: temp}, {$push: {exercises: newExercise}});
+		}
 
                 ret = {newExercise: newExercise, error: error/*, refreshedToken: refreshedToken*/};
                 res.status(200).json(ret);
