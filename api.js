@@ -957,10 +957,10 @@ exports.setApp = function (app, client)
 
 		var error = '';
         var temp = '';
-        const { login, wName, eName, effort, calBurn, calPR, num } = req.body;
+        const { login, wName, eName, effort, num, jwtToken } = req.body;
 
         // Check to see if token is expired, return error if so
-        /*try {
+        try {
             if( token.isExpired(jwtToken)) {
                 var r = {error:'The JWT is no longer valid', jwtToken: ''};
                 res.status(401).json(r);
@@ -975,7 +975,7 @@ exports.setApp = function (app, client)
             refreshedToken = token.refresh(jwtToken);
         } catch(e) {
             console.log(e.message);
-        }*/
+        }
 
         const db = client.db("LargeProject");
 
@@ -996,26 +996,22 @@ exports.setApp = function (app, client)
                 var newExercise = {
                     Name: eName[0],
                     Sets: [],
-		    effort: effort[0],
-                    caloriesBurned: calBurn[0],
-                    Public: temp,
-                    caloriesPerRep: calPR[0]
+		            effort: effort[0],
+                    Public: temp
 		        }
 
 		    for(i = 0; i < num; i++) {
                 newExercise = {
                     Name: eName[i],
                     Sets: [],
-		    effort: effort[i],
-                    caloriesBurned: calBurn[i],
-                    Public: temp,
-                    caloriesPerRep: calPR[i]
+		            effort: effort[i],
+                    Public: temp
 		        }
 					
 		        await db.collection('workoutInfo').updateOne({name:wName, public: temp}, {$push: {exercises: newExercise}});
 		    }
 
-                ret = {newExercise: newExercise, error: error/*, refreshedToken: refreshedToken*/};
+                ret = {newExercise: newExercise, error: error, refreshedToken: refreshedToken};
                 res.status(200).json(ret);
 
             } else {
@@ -1026,7 +1022,7 @@ exports.setApp = function (app, client)
             // set error message to error from DB if that point fails.
             error = e.toString();
 
-            ret = {error:error/*, refreshedToken: refreshedToken*/};
+            ret = {error:error, refreshedToken: refreshedToken};
             res.status(404).json(ret);
         }
 	});
