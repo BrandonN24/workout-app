@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
+import './history.css';
 
 function History() {
   const [date, setDate] = useState(new Date());
@@ -27,9 +28,9 @@ function History() {
 
   const fetchWorkouts = async (date) => {
     try {
-      console.log('date is',date,'login is', 'DerekA');
+      console.log('date is',date,'login is', userID.login);
 
-      var obj = {login:'DerekA',date: date};
+      var obj = {login: userID.login ,date: date};
       var js = JSON.stringify(obj);
 
       var bp = require('./Path.js');
@@ -46,7 +47,7 @@ function History() {
   };
 
   return (
-    <div>
+    <div className="containerH">
       <h1>Workout Calendar</h1>
       <Calendar
         onChange={handleDateChange}
@@ -54,17 +55,31 @@ function History() {
       />
       {error && <div>{error}</div>}
       {workouts.length > 0 && (
-        <div>
-          <h2>Workouts on {date.toLocaleDateString()}</h2>
-          <ul>
-            {workouts.map(workout => (
-              <li key={workout._id}>
-                {workout.exercise} - {workout.weight} lbs x {workout.reps}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+  <div className="containerW">
+    <h2>Workout on {date.toLocaleDateString()}</h2>
+    <ul>
+      {workouts.map(workout => (
+        <li key={workout._id}>
+          {workout.exercises && workout.exercises.map((exercise, index) => (
+            <div key={index}>
+              <p><strong>Exercise Name:</strong> {exercise.Name}</p>
+              <p><strong>Sets:</strong></p>
+              <ul>
+                {exercise.Sets && exercise.Sets.map((set, setIndex) => (
+                  <li key={setIndex}>
+                    Set {setIndex + 1}:<br/>
+                    Reps: {set.reps}<br/>
+                    Weight: {set.weight}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </li>
+      ))}
+    </ul>
+  </div>
+)}
     </div>
   );
 }

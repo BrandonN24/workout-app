@@ -63,6 +63,7 @@ function Login()
 
                 // store JSON object from getUserInfo in userInfo variable
                 let userInfo = JSON.parse(await infoRequest.text());
+                userInfo.login = loginName.value;
                 localStorage.setItem('user_data', JSON.stringify(userInfo));
 
                 // If user has not been email verified, then send them to the email verification page
