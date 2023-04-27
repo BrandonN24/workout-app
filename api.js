@@ -75,8 +75,12 @@ exports.setApp = function (app, client)
     app.post('/api/register', async (req, res, next) => {
         // incoming: name, login, password, email
         // outgoing: error
+
+        // 200 - normal operation
+        // 500 - DB call error
         
         var error = '';
+        var ret = {};
 
         const { login, password, name, email } = req.body;
 
@@ -108,10 +112,11 @@ exports.setApp = function (app, client)
             }
         } catch(e) {
             // set error message to error from DB if that point fails.
-            error = e.toString()
+            error = e.toString();
+            ret = {error: error};
+            res.status(400).json(ret);
         }
 
-        var ret = {error:error};
         res.status(200).json(ret);  // return with HTML code 200 and error message json
     });
     // *******************
@@ -906,7 +911,6 @@ exports.setApp = function (app, client)
         } catch(e) {
             console.log(e.message);
         }
-
         // refresh the token if prev. token not expired
         let refreshedToken = null;
         try {
@@ -1239,7 +1243,6 @@ exports.setApp = function (app, client)
         } catch(e) {
             console.log(e.message);
         }
-
         // refresh the token if prev. token not expired
         let refreshedToken = null;
         try {
@@ -1300,7 +1303,6 @@ exports.setApp = function (app, client)
         } catch(e) {
             console.log(e.message);
         }
-
         // refresh the token if prev. token not expired
         let refreshedToken = null;
         try {
@@ -1324,7 +1326,6 @@ exports.setApp = function (app, client)
                     for(var j = 0; j < exercises.length; j++) {
                         console.log(exercises[j].Name);
                         /*if(exercises[j].Name == eName) {
-
                         }*/
                     }
                 }
@@ -1344,30 +1345,5 @@ exports.setApp = function (app, client)
 	});	
     // *****************
     // END OF WEIGHTBYDATE API
-    // *****************
-}
-
-        // create json outgoing payload object
-        let ret = {};
-
-        try {
-            if(results.length > 0) {
-                const result = await db.collection('workoutInfo').find({dateDone: date}).toArray();
-
-                ret = {workouts: result};
-                res.status(200).json(ret);
-            } else {
-                throw "No Such User";
-            }
-        } catch (e) {
-            // set error message to error from DB if that point fails.
-            error = e.toString();
-
-            ret = {error:error/*, refreshedToken*/};
-            res.status(404).json(ret);
-        }
-	});	
-    // *****************
-    // END OF WORKOUTBYDATE API
     // *****************
 }
