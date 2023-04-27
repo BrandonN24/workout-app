@@ -947,7 +947,7 @@ exports.setApp = function (app, client)
     //addToWorkout API
     //adds an exercise to a workout in the workoutInfo DB
 	app.post('/api/addToWorkout', async(req, res, next) => {		
-		// incoming: login, wName, eName, calories burned, calories per rep
+		// incoming: login, wName, eName, effort, calories burned, calories per rep
 		// outgoing: none
 		
         // error codes:
@@ -957,7 +957,7 @@ exports.setApp = function (app, client)
 
 		var error = '';
         var temp = '';
-        const { login, wName, eName, calBurn, calPR, num } = req.body;
+        const { login, wName, eName, effort, calBurn, calPR, num } = req.body;
 
         // Check to see if token is expired, return error if so
         /*try {
@@ -996,6 +996,7 @@ exports.setApp = function (app, client)
                 var newExercise = {
                     Name: eName[0],
                     Sets: [],
+		    effort: effort[0],
                     caloriesBurned: calBurn[0],
                     Public: temp,
                     caloriesPerRep: calPR[0]
@@ -1005,6 +1006,7 @@ exports.setApp = function (app, client)
                 newExercise = {
                     Name: eName[i],
                     Sets: [],
+		    effort: effort[i],
                     caloriesBurned: calBurn[i],
                     Public: temp,
                     caloriesPerRep: calPR[i]
