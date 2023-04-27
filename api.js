@@ -711,7 +711,7 @@ exports.setApp = function (app, client)
         }
     });
     // ********************************
-    // END OF SEARCHEXERCISE API
+    // END OF GETEXERCISE API
     // ********************************
 
     // createWorkoutTemplate API
