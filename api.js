@@ -587,7 +587,7 @@ exports.setApp = function (app, client)
     // ********************************
 
     // deleteExercise API
-    // deletes an exercise from a user's list
+    // deletes an exercise from a user's exerciseInfo collection
     app.post('/api/deleteExercise', async(req, res, next) => {
         // incoming: exercise name, login, jwtToken
         // outgoing: error, refreshedToken
@@ -651,9 +651,9 @@ exports.setApp = function (app, client)
     // END OF DELETEEXERCISE API
     // ********************************
 
-     // searchExercise API
+     // getExercise API
     // gets all exercises the user personally has as well as all public exercises
-    app.post('/api/searchExercise', async(req, res, next) => {
+    app.post('/api/getExercise', async(req, res, next) => {
         // incoming: login, jwtToken
         // outgoing: all exercises this user has, refreshedToken
 
@@ -945,7 +945,7 @@ exports.setApp = function (app, client)
 
     
     //addToWorkout API
-    //adds an exercise to a workout in the workoutInfo DB
+    //adds an exercise to a workout in the workoutInfo collection
 	app.post('/api/addToWorkout', async(req, res, next) => {		
 		// incoming: login, wName, eName, effort, calories burned, calories per rep
 		// outgoing: none
@@ -957,10 +957,10 @@ exports.setApp = function (app, client)
 
 		var error = '';
         var temp = '';
-        const { login, wName, eName, effort, calBurn, calPR, num } = req.body;
+        const { login, wName, eName, effort, num, jwtToken } = req.body;
 
         // Check to see if token is expired, return error if so
-        /*try {
+        try {
             if( token.isExpired(jwtToken)) {
                 var r = {error:'The JWT is no longer valid', jwtToken: ''};
                 res.status(401).json(r);
@@ -975,7 +975,7 @@ exports.setApp = function (app, client)
             refreshedToken = token.refresh(jwtToken);
         } catch(e) {
             console.log(e.message);
-        }*/
+        }
 
         const db = client.db("LargeProject");
 
@@ -996,26 +996,22 @@ exports.setApp = function (app, client)
                 var newExercise = {
                     Name: eName[0],
                     Sets: [],
-		    effort: effort[0],
-                    caloriesBurned: calBurn[0],
-                    Public: temp,
-                    caloriesPerRep: calPR[0]
+		            effort: effort[0],
+                    Public: temp
 		        }
 
 		    for(i = 0; i < num; i++) {
                 newExercise = {
                     Name: eName[i],
                     Sets: [],
-		    effort: effort[i],
-                    caloriesBurned: calBurn[i],
-                    Public: temp,
-                    caloriesPerRep: calPR[i]
+		            effort: effort[i],
+                    Public: temp
 		        }
 					
 		        await db.collection('workoutInfo').updateOne({name:wName, public: temp}, {$push: {exercises: newExercise}});
 		    }
 
-                ret = {newExercise: newExercise, error: error/*, refreshedToken: refreshedToken*/};
+                ret = {newExercise: newExercise, error: error, refreshedToken: refreshedToken};
                 res.status(200).json(ret);
 
             } else {
@@ -1026,7 +1022,7 @@ exports.setApp = function (app, client)
             // set error message to error from DB if that point fails.
             error = e.toString();
 
-            ret = {error:error/*, refreshedToken: refreshedToken*/};
+            ret = {error:error, refreshedToken: refreshedToken};
             res.status(404).json(ret);
         }
 	});
@@ -1138,7 +1134,7 @@ exports.setApp = function (app, client)
     // *****************
 
     //deleteSet API
-    //adds a set to an exercise in the exerciseInfo DB, not the workoutInfo DB
+    //deletes a set from an exercise in the exerciseInfo DB, not the workoutInfo DB
 	app.post('/api/deleteSet', async(req, res, next) => {		
 		// incoming: exercise name, login, jwtToken
 		// outgoing: the set added, error, refreshedToken
@@ -1206,8 +1202,9 @@ exports.setApp = function (app, client)
     // END OF DELETESET API
     // *****************
 
-    //getPBs API
-    //gets the user's personal bests for all exercise where they have one
+    // getPBs API
+    // gets the user's personal bests for all exercise where they have one
+    // we look at the hasExercises array in the userInfo collection.
 	app.post('/api/getPBs', async(req, res, next) => {		
 		// incoming: login, jwtToken
 		// outgoing: personalBests
@@ -1277,11 +1274,11 @@ exports.setApp = function (app, client)
     // END OF GETPBS API
     // *****************
 
-    //workoutByDate API
-    //gets the user's personal bests for all exercise where they have one
+    // workoutByDate API
+    // returns an array of workouts given a date formatted as MM/DD/YYYY
 	app.post('/api/workoutByDate', async(req, res, next) => {		
 		// incoming: login, date
-		// outgoing: workouts according to the sent date
+		// outgoing: an array of workouts according to the sent date
 
         // error codes;
         // 200 - normal operation
@@ -1289,10 +1286,10 @@ exports.setApp = function (app, client)
         // 404 - DB call failure
 		
 		var error = '';
-        const {login, date} = req.body;
+        const {login, date, jwtToken} = req.body;
 
         const db = client.db("LargeProject");
-/*
+
         // Check to see if token is expired, return error if so
         try {
             if( token.isExpired(jwtToken)) {
@@ -1310,7 +1307,7 @@ exports.setApp = function (app, client)
         } catch(e) {
             console.log(e.message);
         }
-*/
+
         const userExists = await db.collection('userInfo').find({login: login}).toArray();
 
         // create json outgoing payload object
@@ -1320,7 +1317,7 @@ exports.setApp = function (app, client)
             if(userExists.length > 0) {
                 const workouts = await db.collection('workoutInfo').find({dateDone: date}).toArray();
 
-                ret = {workouts: workouts};
+                ret = {workouts: workouts, refreshedToken: refreshedToken};
                 res.status(200).json(ret);
             } else {
                 throw "No Such User";
@@ -1329,7 +1326,7 @@ exports.setApp = function (app, client)
             // set error message to error from DB if that point fails.
             error = e.toString();
 
-            ret = {error:error/*, refreshedToken*/};
+            ret = {error:error, refreshedToken: refreshedToken};
             res.status(404).json(ret);
         }
 	});	
@@ -1337,8 +1334,8 @@ exports.setApp = function (app, client)
     // END OF WORKOUTBYDATE API
     // *****************
 
-    //weightByDate API
-    //gets the user's personal bests for all exercise where they have one
+    // weightByDate API
+    // returns highest weight doen for a given exercise and date.
 	app.post('/api/weightByDate', async(req, res, next) => {		
 		// incoming: login, exercise
 		// outgoing: highest weight done for a given exercise by date
