@@ -262,6 +262,65 @@ exports.setApp = function (app, client)
     // END OF GETUSERINFO API
     // ********************************
 
+    // deleteUser API
+    // Delete a user given their login (used for testing purposes)
+	app.post('/api/deleteUser', async (req, res, next) => {
+		// incoming: login (to search for the user in the database), jwtToken
+		// outgoing: error message, refreshedToken
+		
+		var error = '';
+
+		const { login, jwtToken } = req.body;
+		
+        // Check to see if token is expired, return error if so
+        try {
+            if( token.isExpired(jwtToken)) {
+                var r = {error:'The JWT is no longer valid', jwtToken: ''};
+                res.status(401).json(r);
+                return;
+            }
+        } catch(e) {
+            console.log(e.message);
+        }
+
+		// Connect to the database and get the user object.
+		const db = client.db("LargeProject");
+
+        // Try to find and update a user given a login field and 
+        // update with the given age, height, and weight parameters.
+        try {
+            userExists = await db.collection('userInfo').deleteOne({"login" : login});
+        } catch(e) {
+            error = e.toString();
+            // return error code 400, bad request.
+            res.status(400).json({error: error});
+        }
+
+        // if we didn't find a login matching the one inputted,
+        // then reflect that in the error message.
+        if(userExists.matchedCount == 0){
+            error = "User not found";
+        }
+
+        // refresh token if prev. tok not expired
+        let refreshedToken = null;
+        try {
+            refreshedToken = token.refresh(jwtToken);
+        } catch(e) {
+            console.log(e.message);
+        }
+
+        let ret = {
+            error:error,
+            refreshedToken: refreshedToken
+        };
+
+        res.status(200).json(ret);
+	});
+    // **********************
+    // END OF ADDUSERINFO API
+    // **********************
+
     // nodemailer setup
     // draw from dependencies
     const nodemailer = require('nodemailer');
