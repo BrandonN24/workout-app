@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
-import './../css/history.css';
+import './../css/History.css';
 
 function History() {
   const [date, setDate] = useState(new Date());
