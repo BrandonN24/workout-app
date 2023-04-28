@@ -101,27 +101,74 @@ function VerifyEmail()
             alert(e.toString());
             return;
         }    
-
     }
 
+    window.onload = () => {
+        const autoSendEmail = async () => {
+            // call the sendEmail event
+            // Get token storage functions.
+            let storage = require('../tokenStorage.js');
 
+            // Create json incoming payload
+            let temp = 
+            {
+                email: userID.email,
+                jwtToken: storage.retrieveToken()
+            };
 
+            // stringify the payload.
+            let js = JSON.stringify(temp);
+
+            try
+            {   
+                // get the api buildpath
+                var bp = require('./Path.js');
+                
+                // make the call to the sendEmail API
+                const response = await fetch(bp.buildPath('api/sendEmail'),
+                    {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
+
+                // parse the response from the API
+                var res = JSON.parse(await response.text());
+                
+                if( res.error !== '')
+                {
+                    setMessage(res.error);
+                    return;
+                }
+                else
+                {
+                    setMessage('Email Sent');
+                }
+            }
+            catch(e)
+            {
+                alert(e.toString());
+                return;
+            }    
+        };
+
+        autoSendEmail();
+    };
 
     return (
-        <div id="EmailVerifyDiv">
-            <form onSubmit={sendEmail}>
-            <span id="inner-title">A verification code has been sent to your email!</span><br />
-            <input type="button" id="sendEmailButton" class="buttons" value = "Resend Email"
-            onClick={sendEmail} />
-            </form>
+        <>
+            <div id="EmailVerifyDiv">
+                <form onSubmit={sendEmail}>
+                    <span id="inner-title">A verification code has been sent to your email!</span><br />
+                    <input type="button" id="sendEmailButton" class="buttons" value = "Resend Email"
+                    onClick={sendEmail} />
+                </form>
 
-            <form onSubmit={verifyEmail}>
-            <span id="inner-title">Enter your verification code here</span><br />
-            <input type="text" id="verifyCode" placeholder="Verification Code" ref={(c) => vCode = c} /><br />
-            <input type="submit" id="verifyEmailButton" class="buttons" value = "Verify" onClick={verifyEmail} />
-            </form>
-            <span id="VerifyResult">{message}</span>
-        </div>
+                <form onSubmit={verifyEmail}>
+                    <span id="inner-title">Enter your verification code here</span><br />
+                    <input type="text" id="verifyCode" placeholder="Verification Code" ref={(c) => vCode = c} onFocus=""/><br />
+                    <input type="submit" id="verifyEmailButton" class="buttons" value = "Verify" onClick={verifyEmail} />
+                </form>
+
+                <span id="VerifyResult">{message}</span>
+            </div>
+        </>
     );    
 
 }
