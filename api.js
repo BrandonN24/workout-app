@@ -29,7 +29,7 @@ exports.setApp = function (app, client)
 
         // Establish connection to database and await info from it.
         const db = client.db("LargeProject");
-        const results = await db.collection('userInfo').find({login:login,password:password}).toArray();
+        const userExists = await db.collection('userInfo').find({login:login,password:password}).toArray();
 
         let id = -1;
         let n = ''; // fill this with name from db.
@@ -41,14 +41,14 @@ exports.setApp = function (app, client)
     
         let ret;
 
-        if( results.length > 0 ) {
-            id = results[0]._id;              // case-sensitive to _id field on userInfo document
-            n = results[0].name;              // case-senstive to name field on userInfo document
-            email = results[0].email;         // case-senstive to email field on userInfo document
-            age = results[0].age;             // case-senstive to age field on userInfo document
-            height = results[0].height;       // case-senstive to height field on userInfo document
-            weight = results[0].weight;       // case-senstive to weight field on userInfo document
-            validated = results[0].validated; // case-senstive to validated field on userInfo document
+        if( userExists.length > 0 ) {
+            id = userExists[0]._id;              // case-sensitive to _id field on userInfo document
+            n = userExists[0].name;              // case-senstive to name field on userInfo document
+            email = userExists[0].email;         // case-senstive to email field on userInfo document
+            age = userExists[0].age;             // case-senstive to age field on userInfo document
+            height = userExists[0].height;       // case-senstive to height field on userInfo document
+            weight = userExists[0].weight;       // case-senstive to weight field on userInfo document
+            validated = userExists[0].validated; // case-senstive to validated field on userInfo document
 
             try {
                 const token = require('./createJWT.js');
@@ -100,15 +100,15 @@ exports.setApp = function (app, client)
         };
 
         const db = client.db("LargeProject");
-        const results = await db.collection('userInfo').find({login:login}).toArray();
+        const userExists = await db.collection('userInfo').find({login:login}).toArray();
 
         try{ 
-            if(results.length > 0) {
+            if(userExists.length > 0) {
                 throw "Username Taken";
             } else if (login.toLowerCase() == "public") {
                 throw "Banned Name";
             } else {
-                const results = await db.collection('userInfo').insertOne(newUser);
+                await db.collection('userInfo').insertOne(newUser);
             }
         } catch(e) {
             // set error message to error from DB if that point fails.
@@ -150,7 +150,7 @@ exports.setApp = function (app, client)
         // Try to find and update a user given a login field and 
         // update with the given age, height, and weight parameters.
         try {
-            result = await db.collection('userInfo').updateOne({"login" : login}, {$set: {"age" : age, "height": height, "weight" : weight}});
+            userExists = await db.collection('userInfo').updateOne({"login" : login}, {$set: {"age" : age, "height": height, "weight" : weight}});
         } catch(e) {
             error = e.toString();
             // return error code 400, bad request.
@@ -159,7 +159,7 @@ exports.setApp = function (app, client)
 
         // if we didn't find a login matching the one inputted,
         // then reflect that in the error message.
-        if(result.matchedCount == 0){
+        if(userExists.matchedCount == 0){
             error = "User not found";
         }
 
@@ -212,7 +212,7 @@ exports.setApp = function (app, client)
 
         // Establish connection to database and await info from it.
         const db = client.db("LargeProject");
-        const results = await db.collection('userInfo').find({_id: objId}).toArray();
+        const userInfo = await db.collection('userInfo').find({_id: objId}).toArray();
 
         let n = ''; // fill this with name from db.
         let email = '';
@@ -223,14 +223,14 @@ exports.setApp = function (app, client)
         let hasExercises = '';
         let ret;
 
-        if( results.length > 0 ) {
-            n = results[0].name;              // case-senstive to name field on userInfo document
-            email = results[0].email;         // case-senstive to email field on userInfo document
-            age = results[0].age;             // case-senstive to age field on userInfo document
-            height = results[0].height;       // case-senstive to height field on userInfo document
-            weight = results[0].weight;       // case-senstive to weight field on userInfo document
-            validated = results[0].validated; // case-senstive to validated field on userInfo document
-            hasExercises = results[0].hasExercises;
+        if( userInfo.length > 0 ) {
+            n = userInfo[0].name;              // case-senstive to name field on userInfo document
+            email = userInfo[0].email;         // case-senstive to email field on userInfo document
+            age = userInfo[0].age;             // case-senstive to age field on userInfo document
+            height = userInfo[0].height;       // case-senstive to height field on userInfo document
+            weight = userInfo[0].weight;       // case-senstive to weight field on userInfo document
+            validated = userInfo[0].validated; // case-senstive to validated field on userInfo document
+            hasExercises = userInfo[0].hasExercises;
         } else {
             ret = {error: "ID not found"};
         }
@@ -261,6 +261,65 @@ exports.setApp = function (app, client)
     // ********************************
     // END OF GETUSERINFO API
     // ********************************
+
+    // deleteUser API
+    // Delete a user given their login (used for testing purposes)
+	app.post('/api/deleteUser', async (req, res, next) => {
+		// incoming: login (to search for the user in the database), jwtToken
+		// outgoing: error message, refreshedToken
+		
+		var error = '';
+
+		const { login, jwtToken } = req.body;
+		
+        // Check to see if token is expired, return error if so
+        try {
+            if( token.isExpired(jwtToken)) {
+                var r = {error:'The JWT is no longer valid', jwtToken: ''};
+                res.status(401).json(r);
+                return;
+            }
+        } catch(e) {
+            console.log(e.message);
+        }
+
+		// Connect to the database and get the user object.
+		const db = client.db("LargeProject");
+
+        // Try to find and update a user given a login field and 
+        // update with the given age, height, and weight parameters.
+        try {
+            userExists = await db.collection('userInfo').deleteOne({"login" : login});
+        } catch(e) {
+            error = e.toString();
+            // return error code 400, bad request.
+            res.status(400).json({error: error});
+        }
+
+        // if we didn't find a login matching the one inputted,
+        // then reflect that in the error message.
+        if(userExists.matchedCount == 0){
+            error = "User not found";
+        }
+
+        // refresh token if prev. tok not expired
+        let refreshedToken = null;
+        try {
+            refreshedToken = token.refresh(jwtToken);
+        } catch(e) {
+            console.log(e.message);
+        }
+
+        let ret = {
+            error:error,
+            refreshedToken: refreshedToken
+        };
+
+        res.status(200).json(ret);
+	});
+    // **********************
+    // END OF ADDUSERINFO API
+    // **********************
 
     // nodemailer setup
     // draw from dependencies
@@ -496,12 +555,12 @@ exports.setApp = function (app, client)
 		// Connect to the database and get the user object.
 		const db = client.db("LargeProject");
 
-        const results = await db.collection('userInfo').find({login: temp}).toArray();
+        const userExists = await db.collection('userInfo').find({login: temp}).toArray();
 
         // Try to find and update a user given a login field
         try {
             //if the user is found, or the name passed is "public", add the exercise
-            if((results.length > 0) || (temp == "public")) {
+            if((userExists.length > 0) || (temp == "public")) {
                 const usedEName = await db.collection('exerciseInfo').find({public: temp, name: eName}).toArray();
 
                 if(usedEName.length > 0) {
@@ -523,13 +582,12 @@ exports.setApp = function (app, client)
         }
 
     });
-
     // ********************************
     // END OF CREATEEXERCISE API
     // ********************************
 
     // deleteExercise API
-    // deletes an exercise from a user's list
+    // deletes an exercise from a user's exerciseInfo collection
     app.post('/api/deleteExercise', async(req, res, next) => {
         // incoming: exercise name, login, jwtToken
         // outgoing: error, refreshedToken
@@ -565,18 +623,18 @@ exports.setApp = function (app, client)
 
         const db = client.db("LargeProject");
 
-        const results = await db.collection('userInfo').find({login: login}).toArray();
+        const userExists = await db.collection('userInfo').find({login: login}).toArray();
 
         // create json outgoing payload object
         let ret = {};
 
         try {
             //no such user has been found
-            if(!(results.length > 0)) {
+            if(!(userExists.length > 0)) {
                 throw "No Such User";
             }
 
-            const result = await db.collection('exerciseInfo').deleteOne({name: eName, public: login});     
+            await db.collection('exerciseInfo').deleteOne({name: eName, public: login});     
             
             ret = {error:error, refreshedToken: refreshedToken};
             res.status(200).json(ret);
@@ -593,9 +651,9 @@ exports.setApp = function (app, client)
     // END OF DELETEEXERCISE API
     // ********************************
 
-     // searchExercise API
+     // getExercise API
     // gets all exercises the user personally has as well as all public exercises
-    app.post('/api/searchExercise', async(req, res, next) => {
+    app.post('/api/getExercise', async(req, res, next) => {
         // incoming: login, jwtToken
         // outgoing: all exercises this user has, refreshedToken
 
@@ -628,21 +686,21 @@ exports.setApp = function (app, client)
 
         const db = client.db("LargeProject");
 
-        const results = await db.collection('userInfo').find({login: login}).toArray();
+        const userExists = await db.collection('userInfo').find({login: login}).toArray();
 
         // initialize a json outgoing payload object
         let ret = {};
 
         try {
-            if(results.length > 0) {
-                var searchPublic = results[0].login;
+            if(userExists.length > 0) {
+                var searchPublic = userExists[0].login;
             } else {
                 throw "No Such User";
             }
 
-            const result = await db.collection('exerciseInfo').find({$or: [{public: "public"}, {public: searchPublic}]}).toArray();
+            const exercises = await db.collection('exerciseInfo').find({$or: [{public: "public"}, {public: searchPublic}]}).toArray();
         
-            ret = {exercises: result, refreshedToken: refreshedToken};
+            ret = {exercises: exercises, refreshedToken: refreshedToken};
             res.status(200).json(ret);
         } catch(e) {
             // set error message to error from DB if that point fails.
@@ -653,7 +711,7 @@ exports.setApp = function (app, client)
         }
     });
     // ********************************
-    // END OF SEARCHEXERCISE API
+    // END OF GETEXERCISE API
     // ********************************
 
     // createWorkoutTemplate API
@@ -673,7 +731,7 @@ exports.setApp = function (app, client)
 
         const db = client.db("LargeProject");
 
-		const { name, date, login, jwtToken } = req.body;
+		const { name, login, jwtToken } = req.body;
 
         // Check to see if token is expired, return error if so
         try {
@@ -712,6 +770,8 @@ exports.setApp = function (app, client)
             res.status(400).json(ret);
         } else {
 
+            const date = new Date().toLocaleDateString('en-US');
+
             
             const newWorkout = {
                 name: name,
@@ -722,14 +782,14 @@ exports.setApp = function (app, client)
                 exercises: []
             };
     
-            const results = await db.collection('userInfo').find({login: temp}).toArray();
+            const userExists = await db.collection('userInfo').find({login: temp}).toArray();
     
             try {
-                if(!(results.length > 0) && temp != "public") {
+                if(!(userExists.length > 0) && temp != "public") {
                     throw "No Such User";
                 }
     
-                const result = await db.collection('workoutInfo').insertOne(newWorkout);
+                await db.collection('workoutInfo').insertOne(newWorkout);
     
                 ret = 
                 {
@@ -791,17 +851,17 @@ exports.setApp = function (app, client)
 
         const db = client.db("LargeProject");
 
-        const results = await db.collection('userInfo').find({login: login}).toArray();
+        const userExists = await db.collection('userInfo').find({login: login}).toArray();
 
         // create json outgoing payload object
         let ret = {};        
 
         try {
-            if(!(results.length > 0)) {
+            if(!(userExists.length > 0)) {
                 throw "No Such User";
             }
 
-            const result = await db.collection('workoutInfo').deleteOne({name: wName, public: login});      
+            await db.collection('workoutInfo').deleteOne({name: wName, public: login});      
             
             ret = {error:error, refreshedToken: refreshedToken};
             res.status(200).json(ret);
@@ -818,9 +878,9 @@ exports.setApp = function (app, client)
     // END OF DELETEWORKOUT API
     // ********************************
 
-    // searchWorkout API
+    // getWorkout API
     // gets all workouts the user personally has as well as all public workouts
-    app.post('/api/searchWorkout', async(req, res, next) => {
+    app.post('/api/getWorkout', async(req, res, next) => {
         // incoming: login, jwtToken
         // outgoing: all workouts this user has, refreshedToken
 
@@ -854,23 +914,21 @@ exports.setApp = function (app, client)
 
         const db = client.db("LargeProject");
 
-        const results = await db.collection('userInfo').find({login: login}).toArray();
+        const userExists = await db.collection('userInfo').find({login: login}).toArray();
 
         // create json outgoing payload object
         let ret = {};
 
         try {
-            if(results.length > 0) {
-                var searchPublic = results[0].login;
+            if(userExists.length > 0) {
+                var searchPublic = userExists[0].login;
             } else {
                 throw "No Such User";
             }
 
-            const result = await db.collection('workoutInfo').find({$or: [{public: "public"}, {public: searchPublic}]}).toArray();
+            const workouts = await db.collection('workoutInfo').find({public: searchPublic}).toArray();
         
-            result.push(await db.collection('workoutInfo').find({public: "public"}).toArray());
-
-            ret = {workouts: result, refreshedToken: refreshedToken};
+            ret = {workouts: workouts, refreshedToken: refreshedToken};
             res.status(200).json(ret);
         } catch(e) {
             // set error message to error from DB if that point fails.
@@ -882,14 +940,14 @@ exports.setApp = function (app, client)
         }
     });
     // ********************************
-    // END OF SEARCHWORKOUT API
+    // END OF GETWORKOUT API
     // ********************************
 
     
     //addToWorkout API
-    //adds an exercise to a workout in the workoutInfo DB
+    //adds an exercise to a workout in the workoutInfo collection
 	app.post('/api/addToWorkout', async(req, res, next) => {		
-		// incoming: login, wName, eName, calories burned, calories per rep
+		// incoming: login, wName, eName, effort, calories burned, calories per rep
 		// outgoing: none
 		
         // error codes:
@@ -899,10 +957,10 @@ exports.setApp = function (app, client)
 
 		var error = '';
         var temp = '';
-        const { login, wName, eName, calBurn, calPR, num } = req.body;
+        const { login, wName, eName, effort, num, jwtToken } = req.body;
 
         // Check to see if token is expired, return error if so
-        /*try {
+        try {
             if( token.isExpired(jwtToken)) {
                 var r = {error:'The JWT is no longer valid', jwtToken: ''};
                 res.status(401).json(r);
@@ -917,7 +975,7 @@ exports.setApp = function (app, client)
             refreshedToken = token.refresh(jwtToken);
         } catch(e) {
             console.log(e.message);
-        }*/
+        }
 
         const db = client.db("LargeProject");
 
@@ -938,25 +996,22 @@ exports.setApp = function (app, client)
                 var newExercise = {
                     Name: eName[0],
                     Sets: [],
-                    caloriesBurned: calBurn[0],
-                    Public: temp,
-                    caloriesPerRep: calPR[0]
+		            effort: effort[0],
+                    Public: temp
 		        }
 
-		    for(i = 0; i < num; i++)
-		    {
+		    for(i = 0; i < num; i++) {
                 newExercise = {
                     Name: eName[i],
                     Sets: [],
-                    caloriesBurned: calBurn[i],
-                    Public: temp,
-                    caloriesPerRep: calPR[i]
+		            effort: effort[i],
+                    Public: temp
 		        }
 					
 		        await db.collection('workoutInfo').updateOne({name:wName, public: temp}, {$push: {exercises: newExercise}});
 		    }
 
-                ret = {newExercise: newExercise, error: error/*, refreshedToken: refreshedToken*/};
+                ret = {newExercise: newExercise, error: error, refreshedToken: refreshedToken};
                 res.status(200).json(ret);
 
             } else {
@@ -967,7 +1022,7 @@ exports.setApp = function (app, client)
             // set error message to error from DB if that point fails.
             error = e.toString();
 
-            ret = {error:error/*, refreshedToken: refreshedToken*/};
+            ret = {error:error, refreshedToken: refreshedToken};
             res.status(404).json(ret);
         }
 	});
@@ -1047,13 +1102,13 @@ exports.setApp = function (app, client)
             temp = login;
         }
 
-        const results = await db.collection('exerciseInfo').find({name: eName, public: temp}).toArray();
+        const userExists = await db.collection('exerciseInfo').find({name: eName, public: temp}).toArray();
 
         // create json outgoing payload object
         let ret = {};
 
         try {
-            if(results.length > 0) {
+            if(userExists.length > 0) {
                 const newSet = {
                     reps:reps,
                     weight:weight
@@ -1079,7 +1134,7 @@ exports.setApp = function (app, client)
     // *****************
 
     //deleteSet API
-    //adds a set to an exercise in the exerciseInfo DB, not the workoutInfo DB
+    //deletes a set from an exercise in the exerciseInfo DB, not the workoutInfo DB
 	app.post('/api/deleteSet', async(req, res, next) => {		
 		// incoming: exercise name, login, jwtToken
 		// outgoing: the set added, error, refreshedToken
@@ -1121,13 +1176,13 @@ exports.setApp = function (app, client)
             temp = login;
         }
 
-        const results = await db.collection('exerciseInfo').find({name: eName, public: temp}).toArray();
+        const userExists = await db.collection('exerciseInfo').find({name: eName, public: temp}).toArray();
 
         // Create json outgoing payload object
         let ret = {};
 
         try {
-            if(results.length > 0) {
+            if(userExists.length > 0) {
                 await db.collection('exerciseInfo').updateOne({name:eName, public: temp}, {$pop: {sets: -1}});
 
                 ret = {error: "Deleted Set", refreshedToken: refreshedToken};
@@ -1147,8 +1202,9 @@ exports.setApp = function (app, client)
     // END OF DELETESET API
     // *****************
 
-    //getPBs API
-    //gets the user's personal bests for all exercise where they have one
+    // getPBs API
+    // gets the user's personal bests for all exercise where they have one
+    // we look at the hasExercises array in the userInfo collection.
 	app.post('/api/getPBs', async(req, res, next) => {		
 		// incoming: login, jwtToken
 		// outgoing: personalBests
@@ -1182,19 +1238,20 @@ exports.setApp = function (app, client)
             console.log(e.message);
         }
 
-        const results = await db.collection('userInfo').find({login: login}).toArray();
+        const userExists = await db.collection('userInfo').find({login: login}).toArray();
 
         // create json outgoing payload object
         let ret = {};
 
         try {
-            if(results.length > 0) {
-                if(results[0].hasExercises.length > 0) {
+            if(userExists.length > 0) {
+                if(userExists[0].hasExercises.length > 0) {
                     var personalBests = [];
 
-                    for(var i = 0; i < results[0].hasExercises.length; i++) {
-                        personalBests[i] = personalBests[0].hasExercises[i].exerciseName + ": " + personalBests[0].hasExercises[i].personalBest;
+                    for(var i = 0; i < userExists[0].hasExercises.length; i++) {
+                        personalBests[i] = userExists[0].hasExercises[i].exerciseName + ": " + userExists[0].hasExercises[i].personalBest;
                     }
+
                     ret = {personalBests: personalBests, refreshedToken: refreshedToken}
                     res.status(200).json(ret);
                 } else {
@@ -1217,11 +1274,11 @@ exports.setApp = function (app, client)
     // END OF GETPBS API
     // *****************
 
-    //workoutByDate API
-    //gets the user's personal bests for all exercise where they have one
+    // workoutByDate API
+    // returns an array of workouts given a date formatted as MM/DD/YYYY
 	app.post('/api/workoutByDate', async(req, res, next) => {		
 		// incoming: login, date
-		// outgoing: workouts according to the sent date
+		// outgoing: an array of workouts according to the sent date
 
         // error codes;
         // 200 - normal operation
@@ -1229,10 +1286,10 @@ exports.setApp = function (app, client)
         // 404 - DB call failure
 		
 		var error = '';
-        const {login, date} = req.body;
+        const {login, date, jwtToken} = req.body;
 
         const db = client.db("LargeProject");
-/*
+
         // Check to see if token is expired, return error if so
         try {
             if( token.isExpired(jwtToken)) {
@@ -1250,17 +1307,17 @@ exports.setApp = function (app, client)
         } catch(e) {
             console.log(e.message);
         }
-*/
-        const results = await db.collection('userInfo').find({login: login}).toArray();
+
+        const userExists = await db.collection('userInfo').find({login: login}).toArray();
 
         // create json outgoing payload object
         let ret = {};
 
         try {
-            if(results.length > 0) {
-                const result = await db.collection('workoutInfo').find({dateDone: date}).toArray();
+            if(userExists.length > 0) {
+                const workouts = await db.collection('workoutInfo').find({dateDone: date}).toArray();
 
-                ret = {workouts: result};
+                ret = {workouts: workouts, refreshedToken: refreshedToken};
                 res.status(200).json(ret);
             } else {
                 throw "No Such User";
@@ -1269,7 +1326,7 @@ exports.setApp = function (app, client)
             // set error message to error from DB if that point fails.
             error = e.toString();
 
-            ret = {error:error/*, refreshedToken*/};
+            ret = {error:error, refreshedToken: refreshedToken};
             res.status(404).json(ret);
         }
 	});	
@@ -1277,8 +1334,8 @@ exports.setApp = function (app, client)
     // END OF WORKOUTBYDATE API
     // *****************
 
-    //weightByDate API
-    //gets the user's personal bests for all exercise where they have one
+    // weightByDate API
+    // returns highest weight doen for a given exercise and date.
 	app.post('/api/weightByDate', async(req, res, next) => {		
 		// incoming: login, exercise
 		// outgoing: highest weight done for a given exercise by date
@@ -1345,5 +1402,59 @@ exports.setApp = function (app, client)
 	});	
     // *****************
     // END OF WEIGHTBYDATE API
+    // *****************
+
+    //completeWorkout API
+    //takes incoming exercises and sets and adds them to an existing workout
+    app.post('/api/completeWorkout', async (req, res, next) => {
+        const { wName, login, exercises } = req.body;
+        //const { name, exercises } = workout;
+
+        const db = client.db("LargeProject");
+      
+        const userExists = await db.collection('userInfo').find({login: login}).toArray();
+
+        let ret = {};
+
+        try {
+          if (userExists.length > 0) {
+            const workoutExists = await db.collection('workoutInfo').find({name: wName}).toArray();
+
+            if (!(workoutExists.length > 0)) {
+                var date = new Date().toLocaleDateString('en-US');
+
+                if(date.charAt(0) != '1') {
+                    date = date.padStart((date.length + 1), "0");
+                }
+
+                const workout = {
+                   name: wName,
+                   public: login,
+                   dateDone: date,
+                   caloriesBurned: -1,
+                   duration: -1,
+                   exercises: exercises
+                }
+                
+                await db.collection('workoutInfo').insertOne(workout);
+
+                ret = {workout: workout};
+                res.status(200).json(ret);
+                /*const result = await db.collection('users').updateOne({ login: login }, {$push: {workouts: {name: name, date: new Date(date), exercises: exercises*/
+            } else {
+               throw "User Already Has Workout";
+            }
+        } else {
+            throw "No Such User";
+        }
+    } catch (e) {
+        error = e.toString();
+
+        ret = {error: error};
+        res.status(404).json(ret);
+    }
+    });
+    // *****************
+    // END OF COMPLETEWORKOUT API
     // *****************
 }
