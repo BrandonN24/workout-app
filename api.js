@@ -1507,7 +1507,7 @@ exports.setApp = function (app, client)
 	ret = {validated:validated,error:error};
 	res.status(200).json(ret);
 		
-	}
+	});
 	// *****************
         // END OF VERIFYPASSWORDCHANGE API
         // *****************
@@ -1540,7 +1540,7 @@ exports.setApp = function (app, client)
 	ret = {password:newPass,error:error};
 	res.status(200).json(ret);
 		
-	}
+	});
 	// *****************
         // END OF CHANGEPASSWORD API
         // *****************
