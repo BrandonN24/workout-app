@@ -103,11 +103,11 @@ function Login()
         <div class="container">
             <div class="loginDiv">
                 <form onSubmit={doLogin}>
-                <span id="inner-title">PLEASE LOG IN</span><br />
+                {/* <span id="inner-title">PLEASE LOG IN</span><br /> */}
                 <input type="text" id="loginName" placeholder="Username" ref={(c) => loginName = c} /><br />
                 <input type="password" id="loginPassword" placeholder="Password" ref={(c) => loginPassword = c} /><br />
 
-                <input type="submit" id="loginButton" class="buttons" value = "Do It"
+                <input type="submit" id="loginButton" class="buttons" value = "sign in"
                 onClick={doLogin} />
                 </form>
                 <span id="loginResult">{message}</span><br />
