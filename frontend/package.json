@@ -16,7 +16,6 @@
     "jsonwebtoken": "^9.0.0",
     "react": "^18.2.0",
     "react-calendar": "^4.2.1",
-    "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
     "react-horizontal-scrolling-menu": "^4.0.4",
     "react-jwt": "^1.1.8",
