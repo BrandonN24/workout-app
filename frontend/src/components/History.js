@@ -30,7 +30,12 @@ function History() {
     try {
       console.log('date is',date,'login is', userID.login);
 
-      var obj = {login: userID.login ,date: date};
+      var obj = 
+      {
+        login: userID.login,
+        date: date,
+        jwtToken: userID.jwtToken.accessToken
+      };
       var js = JSON.stringify(obj);
 
       var bp = require('./Path.js');
@@ -39,6 +44,10 @@ function History() {
 
       const data = await response.json();
       console.log(data);
+
+      let storage = require('../tokenStorage.js');
+      storage.storeToken(data.refreshedToken);
+
       return {ok: response.ok, data};
     } catch (error) {
       setError('Unable to fetch workouts');

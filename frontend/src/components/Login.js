@@ -15,7 +15,6 @@ function saveCookie()
 
 function Login()
 {
-
     var loginName;
     var loginPassword;
 
@@ -25,7 +24,11 @@ function Login()
     {
         event.preventDefault();
 
-        var obj = {login:loginName.value,password:loginPassword.value};
+        var obj = 
+        {
+            login:loginName.value,
+            password:loginPassword.value
+        };
         var js = JSON.stringify(obj);
 
         try
