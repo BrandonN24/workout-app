@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   FlatList,
   Alert,
+  TextInput,
 } from 'react-native';
 import jwt_decode from 'jwt-decode'; // for decoding JWT token
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -14,6 +15,8 @@ import {useIsFocused} from '@react-navigation/native';
 
 const Home = ({navigation}) => {
   const [workouts, setWorkouts] = useState([]);
+  const [filteredWorkouts, setFilteredWorkouts] = useState([]);
+  const [searchTerm, setSearchText] = useState('');
   const isFocused = useIsFocused();
 
   useEffect(() => {
@@ -46,6 +49,18 @@ const Home = ({navigation}) => {
       fetchData();
     }
   }, [isFocused]);
+
+  const handleSearch = text => {
+    setSearchText(text);
+    if (text.length > 0) {
+      const filtered = workouts.filter(workout =>
+        workout.name.toLowerCase().includes(text.toLowerCase()),
+      );
+      setFilteredWorkouts(filtered);
+    } else {
+      setFilteredWorkouts([]);
+    }
+  };
 
   const renderWorkoutItem = ({item}) => {
     const handleDelete = async () => {
@@ -102,7 +117,30 @@ const Home = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      {workouts.length > 0 ? (
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchBar}
+          onChangeText={handleSearch}
+          value={searchTerm}
+          placeholder="Search Workouts"
+        />
+        <TouchableOpacity style={styles.searchButton}>
+          <Text style={styles.searchButtonText}>Search</Text>
+        </TouchableOpacity>
+      </View>
+      {filteredWorkouts.length > 0 ? (
+        <>
+          <View style={styles.tableHeader}>
+            <Text style={styles.headerText}>Date</Text>
+            <Text style={styles.headerText}>Workout Name</Text>
+          </View>
+          <FlatList
+            data={filteredWorkouts}
+            renderItem={renderWorkoutItem}
+            keyExtractor={(item, index) => index.toString()}
+          />
+        </>
+      ) : workouts.length > 0 ? (
         <>
           <View style={styles.tableHeader}>
             <Text style={styles.headerText}>Date</Text>
@@ -162,6 +200,31 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   deleteButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    marginBottom: 10,
+  },
+  searchBar: {
+    flex: 1,
+    height: 40,
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 5,
+    marginRight: 10,
+    paddingLeft: 10,
+  },
+  searchButton: {
+    backgroundColor: 'gray',
+    padding: 10,
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  searchButtonText: {
     color: 'white',
     fontWeight: 'bold',
     fontSize: 16,
