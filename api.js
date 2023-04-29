@@ -423,6 +423,74 @@ exports.setApp = function (app, client)
     // END OF SENDMAIL API
     // ********************************
 
+    //sendEmail tokenless API
+    //Endpoint to initiate the email verification process
+    app.post('/api/sendEmailTokenless', async (req, res) => {
+        // incoming: email, jwtToken
+        // outgoing: message, refreshedToken
+
+        // error codes:
+        // 400 - bad request
+        // 500 - email send error
+
+        const { email } = req.body;
+
+        // Generate a verification code
+        const verificationCode = uuidv4();
+
+        let ret = {};
+
+        // Connect to the database and get the user object.
+		const db = client.db("LargeProject");
+
+        // Try to find and update a user given a login field and 
+        // update with the given age, height, and weight parameters.
+        try {
+            result = await db.collection('userInfo').updateOne({"email" : email}, {$set: {"vCode" : verificationCode}});
+        } catch(e) {
+            error = e.toString();
+            // return error code 400, bad request.
+            res.status(400).json({error: error});
+        }
+
+         // Send the verification code to the user's email address
+         transporter.sendMail({
+            from: 'workoutappgroup9@gmail.com',
+            to: req.body.email,
+            subject: 'Email Verification Code',
+            text: `Your email verification code is: ${verificationCode}`,
+        }, (error, info) => {
+            if (error) {
+                console.log(error);
+
+                // create json payload for outgoing
+                ret =
+                {
+                    message : "Error sending email",
+                }
+
+                res.status(500).json(ret);
+            } else {
+                console.log('Email sent: ' + info.response);
+
+                // Store the verification code in the database or cache
+                // associated with the user's email address for later verification
+
+                // create json payload for outgoing
+                ret =
+                {
+                    message : "Verification email sent",
+                }
+
+                // Return a success response to the client
+                res.status(200).json(ret);
+            }
+        });
+    });
+    // ********************************
+    // END OF SENDMAIL TOKENLESS API
+    // ********************************
+
     // verifyEmail API
     // Checks if the User has inputted the correct verification code
     app.post('/api/verifyEmail', async (req, res) => {
