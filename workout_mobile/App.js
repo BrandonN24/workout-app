@@ -11,6 +11,7 @@ import AddUserInfo from './components/screens/AddUserInfo';
 import ValidateEmail from './components/screens/ValidateEmail';
 import FinishWorkout from './components/screens/FinishWorkout';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import WorkoutDetails from './components/screens/WorkoutDetails';
 
 const theme = {
   ...DefaultTheme,
@@ -111,6 +112,10 @@ const App = () => {
           <Stack.Screen
             name="FinishWorkout"
             component={FinishWorkout}></Stack.Screen>
+          <Stack.Screen
+            name="WorkoutDetails"
+            component={WorkoutDetails}
+            options={{headerShown: true}}></Stack.Screen>
         </Stack.Navigator>
       )}
     </NavigationContainer>

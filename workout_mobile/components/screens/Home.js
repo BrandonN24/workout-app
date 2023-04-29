@@ -1,32 +1,101 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, FlatList} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  Alert,
+} from 'react-native';
 import jwt_decode from 'jwt-decode'; // for decoding JWT token
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import client from '../../api/client';
+import {useIsFocused} from '@react-navigation/native';
 
 const Home = ({navigation}) => {
   const [workouts, setWorkouts] = useState([]);
+  const isFocused = useIsFocused();
 
   useEffect(() => {
-    // Decode JWT token to get workout information
-    const token = 'YOUR_JWT_TOKEN_HERE';
-    let decodedToken;
-    try {
-      decodedToken = jwt_decode(token);
-    } catch (err) {
-      //console.error(err);
-      decodedToken = {};
+    const fetchData = async () => {
+      try {
+        let token = await AsyncStorage.getItem('token');
+        const decodedToken = jwt_decode(token);
+        let sendID = {
+          login: decodedToken.login,
+          jwtToken: token,
+        };
+        let jsIdObj = JSON.stringify(sendID);
+        const parsedIdObj = JSON.parse(jsIdObj);
+        const getWorkouts = await client.post('/api/getWorkout', {
+          ...parsedIdObj,
+        });
+        //console.log('these are the workouts ');
+        //console.log(getWorkouts.data.workouts);
+        await AsyncStorage.setItem(
+          'token',
+          getWorkouts.data.refreshedToken.accessToken,
+        );
+        setWorkouts(getWorkouts.data.workouts);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    if (isFocused) {
+      fetchData();
     }
-    const workoutData = decodedToken.workouts || [];
-    setWorkouts(workoutData);
-  }, []);
+  }, [isFocused]);
 
   const renderWorkoutItem = ({item}) => {
+    const handleDelete = async () => {
+      try {
+        let token = await AsyncStorage.getItem('token');
+        const decodedToken = jwt_decode(token);
+        let data = {
+          wName: item.name,
+          login: decodedToken.login,
+          jwtToken: token,
+        };
+        console.log(data);
+        let jsonData = JSON.stringify(data);
+        let parseData = JSON.parse(jsonData);
+        const response = await client.post('/api/deleteWorkout', {
+          ...parseData,
+        });
+        console.log(response);
+        await AsyncStorage.setItem(
+          'token',
+          response.data.refreshedToken.accessToken,
+        );
+        setWorkouts(prevWorkouts =>
+          prevWorkouts.filter(workout => workout.name !== item.name),
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const handleAlert = () => {
+      Alert.alert(
+        'Confirm Delete',
+        `Are you sure you want to delete ${item.name}?`,
+        [
+          {text: 'Cancel', style: 'cancel'},
+          {text: 'Delete', onPress: handleDelete},
+        ],
+      );
+    };
+
     return (
       <TouchableOpacity
         style={styles.cell}
         onPress={() => navigation.navigate('WorkoutDetails', {workout: item})}>
-        <Text style={styles.cellText}>{item.date}</Text>
+        <Text style={styles.cellText}>{item.dateDone}</Text>
         <Text style={styles.cellText}>{item.name}</Text>
-        <Text style={styles.cellText}>{item.duration}</Text>
+        <TouchableOpacity style={styles.deleteButton} onPress={handleAlert}>
+          <Text style={styles.deleteButtonText}>Delete</Text>
+        </TouchableOpacity>
       </TouchableOpacity>
     );
   };
@@ -38,7 +107,6 @@ const Home = ({navigation}) => {
           <View style={styles.tableHeader}>
             <Text style={styles.headerText}>Date</Text>
             <Text style={styles.headerText}>Workout Name</Text>
-            <Text style={styles.headerText}>Duration</Text>
           </View>
           <FlatList
             data={workouts}
@@ -84,6 +152,19 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginTop: 50,
+  },
+  deleteButton: {
+    backgroundColor: 'red',
+    padding: 10,
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 10,
+  },
+  deleteButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });
 

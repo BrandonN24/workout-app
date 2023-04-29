@@ -12,6 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const NewExercise = () => {
   const [exercises, setExercises] = useState(['']);
   const [editing, setEditing] = useState(false);
+  const [workoutName, setWorkoutName] = useState('');
 
   const handleAddExercise = () => {
     if (exercises[exercises.length - 1] !== '') {
@@ -43,11 +44,29 @@ const NewExercise = () => {
     setExercises(newExercises);
   };
 
+  const handleWorkoutNameChange = text => {
+    setWorkoutName(text);
+  };
+
+  const handleSaveWorkoutName = async () => {
+    try {
+      await AsyncStorage.setItem('workoutName', workoutName);
+    } catch (error) {
+      console.log('Error saving workout name:', error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerText}>Make A New Workout</Text>
-        <TextInput style={styles.headerInput} placeholder="Workout name" />
+        <TextInput
+          style={styles.headerInput}
+          placeholder="Workout name"
+          value={workoutName}
+          onChangeText={handleWorkoutNameChange}
+          onBlur={handleSaveWorkoutName}
+        />
       </View>
       <View style={styles.table}>
         {exercises.map((exercise, index) => (

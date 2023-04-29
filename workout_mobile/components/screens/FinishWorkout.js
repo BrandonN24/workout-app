@@ -9,6 +9,8 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
+import client from '../../api/client';
+import jwt_decode from 'jwt-decode';
 
 const FinishWorkout = () => {
   const [exerciseNames, setExerciseNames] = useState([]);
@@ -51,23 +53,31 @@ const FinishWorkout = () => {
 
   const finishWorkout = async () => {
     try {
-      const workoutData = {
+      let token = await AsyncStorage.getItem('token');
+      const decodedToken = jwt_decode(token);
+      console.log(decodedToken);
+
+      let wName = await AsyncStorage.getItem('workoutName');
+
+      let workoutData = {
+        wName: wName,
+        login: decodedToken.login,
         exercises: exerciseNames.map((name, index) => ({
-          name,
-          sets: sets[index].map(set => ({weight: set.weight, reps: set.reps})),
+          Name: name,
+          effort: 5,
+          public: decodedToken.login,
+          Sets: sets[index].map(set => ({weight: set.weight, reps: set.reps})),
         })),
       };
 
       console.log(JSON.stringify(workoutData));
-
-      //   const response = await fetch('https://example.com/api/workouts', {
-      //     method: 'POST',
-      //     headers: {
-      //       'Content-Type': 'application/json',
-      //     },
-      //     body: JSON.stringify(workoutData),
-      //   });
-      //   const result = await response.json();
+      let sendWorkout = JSON.stringify(workoutData);
+      let parseWorkout = JSON.parse(sendWorkout);
+      console.log(parseWorkout);
+      const response = await client.post('/api/completeWorkout', {
+        ...parseWorkout,
+      });
+      console.log('Workout added');
       navigation.navigate('Home');
     } catch (error) {
       console.log(error);

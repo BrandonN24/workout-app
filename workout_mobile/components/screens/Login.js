@@ -37,12 +37,12 @@ const Login = ({setLoggedInState}) => {
   const handleLogin = async (values, formikActions) => {
     try {
       const {data: res} = await client.post('/api/login', {...values});
-//
+      //
       let storage = require('../../tokenStorage');
       storage.storeToken(res);
       await AsyncStorage.setItem('token', res.accessToken);
       const decodedToken = jwt_decode(res.accessToken);
-      console.log(decodedToken);
+      //console.log(decodedToken);
       if (decodedToken.id != -1) {
         //setLoggedIn(true);
         //setLoggedInState();
@@ -55,15 +55,15 @@ const Login = ({setLoggedInState}) => {
         const infoRequest = await client.post('/api/getUserInfo', {
           ...parsedIdObj,
         });
-        console.log(infoRequest.data);
+        //console.log(infoRequest.data);
         await AsyncStorage.setItem('data', JSON.stringify(infoRequest.data));
         //await AsyncStorage.removeItem('token');
-        console.log(infoRequest.data.jwtToken.accessToken);
+        //console.log(infoRequest.data.jwtToken.accessToken);
         await AsyncStorage.setItem(
           'token',
           infoRequest.data.jwtToken.accessToken,
         );
-        console.log('Logged in set to true');
+        //console.log('Logged in set to true');
 
         if (infoRequest.data.validated == false) {
           var token = await AsyncStorage.getItem('token');
@@ -73,7 +73,7 @@ const Login = ({setLoggedInState}) => {
           const sendEmail = await client.post('/api/sendEmail', {
             ...parsedIdObj,
           });
-          console.log(sendEmail);
+          //console.log(sendEmail);
           navigation.navigate('ValidateEmail');
         } else if (
           infoRequest.data.height == -1 &&
