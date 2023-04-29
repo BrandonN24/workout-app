@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import * as mdb from 'mdb-ui-kit'; // lib
+import { Line } from 'react-chartjs-2';
 
 function Stats()
 {
@@ -116,7 +116,7 @@ function Stats()
       </div>
 
       <div> 
-        <h2>Highest Weight for {exerciseQuery} by Date
+        <h2>Highest Weight for Exercise by Date
         </h2> 
         <table> 
           <thead> 
