@@ -1,5 +1,3 @@
-/*@import '~mdb-ui-kit/css/mdb.min.css';*/
-
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
@@ -53,7 +51,7 @@ a:hover{
   background-color: #3C6E71;
 }
 
-#loginDiv{
+/* #loginDiv{
   padding:25px;
   margin: 0 auto;
   text-align: center;
@@ -61,7 +59,7 @@ a:hover{
   width: 300px;
   background-color: rgb(60, 110, 113,.9);
   border-radius: 20px;
-}
+} */
 
 #registerDiv{
   padding:25px;

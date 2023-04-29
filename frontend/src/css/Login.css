@@ -1,0 +1,14 @@
+.container{
+    display: grid;
+    height: 180px;
+    grid-template-rows: 180px;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    justify-items: center;
+}
+
+.loginDiv{
+    grid-row: 1;
+    grid-column: 1;
+    background-color: white;
+    opacity: 0.8;
+}

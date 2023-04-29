@@ -1,6 +1,8 @@
 import React, {useState} from 'react';
 import {Link} from 'react-router-dom';
 import {useJwt, isExpired, decodeToken} from "react-jwt";
+import bootstrap from 'bootstrap';
+import './../css/Login.css';
 
 let cookieName = "";
 let cookieID = [];
@@ -98,28 +100,31 @@ function Login()
 
 
     return(
-      <div id="loginDiv">
-        <form onSubmit={doLogin}>
-        <span id="inner-title">PLEASE LOG IN</span><br />
-        <input type="text" id="loginName" placeholder="Username" ref={(c) => loginName = c} /><br />
-        <input type="password" id="loginPassword" placeholder="Password" ref={(c) => loginPassword = c} /><br />
+        <div class="container">
+            <div class="loginDiv">
+                <form onSubmit={doLogin}>
+                <span id="inner-title">PLEASE LOG IN</span><br />
+                <input type="text" id="loginName" placeholder="Username" ref={(c) => loginName = c} /><br />
+                <input type="password" id="loginPassword" placeholder="Password" ref={(c) => loginPassword = c} /><br />
 
-        <input type="submit" id="loginButton" class="buttons" value = "Do It"
-          onClick={doLogin} />
-        </form>
-        <span id="loginResult">{message}</span><br />
-     
-        <span className = "link register">
-            <span style={{fontSize:15}}>
-                No account? Register
-            </span>
-            <Link to='/RegisterPage'>
-            <span style={{fontSize:15}}>
-                &nbsp;here.
-            </span>
-            </Link>
-        </span>
-     </div>
+                <input type="submit" id="loginButton" class="buttons" value = "Do It"
+                onClick={doLogin} />
+                </form>
+                <span id="loginResult">{message}</span><br />
+            
+                <span className = "link register">
+                    <span style={{fontSize:15}}>
+                        No account? Register
+                    </span>
+                    <Link to='/RegisterPage'>
+                    <span style={{fontSize:15}}>
+                        &nbsp;here.
+                    </span>
+                    </Link>
+                </span>
+            </div>
+        </div>
+      
     );
 };
 
