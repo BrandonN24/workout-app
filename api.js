@@ -1317,7 +1317,7 @@ exports.setApp = function (app, client) {
 
         try {
             if(userExists.length > 0) {
-                const workouts = await db.collection('workoutInfo').find({dateDone: date}).toArray();
+                const workouts = await db.collection('workoutInfo').find({dateDone: date, public: login}).toArray();
 
                 ret = {workouts: workouts, refreshedToken: refreshedToken};
                 res.status(200).json(ret);
@@ -1459,4 +1459,91 @@ exports.setApp = function (app, client) {
     // *****************
     // END OF COMPLETEWORKOUT API
     // *****************
+	
+    //verifyPasswordChange API
+    //similar to verifyEmail but used for password change
+    app.post('/api/verifyPasswordChange', async(req, res, next) => {		
+	// incoming: login, email
+	// outgoing: verification status
+
+        // error codes;
+        // 200 - normal operation
+        // 400 - DB call failure
+		
+	var error = '';
+        const {login, email} = req.body;
+		
+	let ret = {};
+
+        const db = client.db("LargeProject");
+		
+	const user = db.collection('userInfo').find({login:login}).toArray();
+		
+	const validated = false;
+		
+	try
+	{
+	    if(user.length > 0)
+	    {
+		if(user[0].validated)
+		{
+		    validated = true;
+		}
+		else
+		{
+		    validated = false;
+		}
+	    }
+	    else
+	    {
+		throw "No Such User";
+	    }
+	}
+	catch(e)
+	{
+	    error = e.toString();
+	    ret = {validated:validated,error:error};
+	    res.status(400).json(ret);
+	}
+		
+	ret = {validated:validated,error:error};
+	res.status(200).json(ret);
+		
+	});
+	// *****************
+        // END OF VERIFYPASSWORDCHANGE API
+        // *****************
+	
+	//changePassword API
+        //after verifying the password change (previous API), this one carries out the change
+	app.post('/api/changePassword', async(req, res, next) => {		
+	// incoming: login, newPass
+	// outgoing: new password
+
+        // error codes;
+        // 200 - normal operation
+        // 400 - DB call failure
+		
+	var error = '';
+        const {login, newPass} = req.body;
+		
+	let ret = {};
+
+        const db = client.db("LargeProject");
+		
+	try {
+            const result = await db.collection('userInfo').updateOne({"login" : login}, {$set: {"password" : newPass}});
+        } catch(e) {
+            error = e.toString();
+            // return error code 400, bad request.
+            res.status(400).json({error: error});
+        }
+
+	ret = {password:newPass,error:error};
+	res.status(200).json(ret);
+		
+	});
+	// *****************
+        // END OF CHANGEPASSWORD API
+        // *****************
 }
