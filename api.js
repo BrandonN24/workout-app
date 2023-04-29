@@ -1315,7 +1315,7 @@ exports.setApp = function (app, client)
 
         try {
             if(userExists.length > 0) {
-                const workouts = await db.collection('workoutInfo').find({dateDone: date}).toArray();
+                const workouts = await db.collection('workoutInfo').find({dateDone: date, public: login}).toArray();
 
                 ret = {workouts: workouts, refreshedToken: refreshedToken};
                 res.status(200).json(ret);
