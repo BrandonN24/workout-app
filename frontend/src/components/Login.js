@@ -100,7 +100,7 @@ function Login()
 
 
     return(
-        <div class="container">
+        <div class="loginContainer">
             <div class="loginDiv">
                 <form onSubmit={doLogin}>
                 <input type="text" id="loginName" placeholder="Username" ref={(c) => loginName = c} /><br />

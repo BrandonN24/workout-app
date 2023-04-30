@@ -1,4 +1,4 @@
-.container{
+.loginContainer{
     display: flex;
     height: 300px;
     /* grid-template-rows: repeat(auto-fit, minmax(100px, 1fr)); */
