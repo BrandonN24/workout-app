@@ -4,12 +4,12 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-image: url("./components/images/background.jpg");
-  margin: 0 auto 100px;
+  /* background-image: url("./components/images/background.jpg"); */
+  /* margin: 0 auto 100px;
   background-size: cover;
   background-repeat: no-repeat;
   overflow-x:hidden;
-  padding-top: 40px;
+  padding-top: 0px; */
 }
 
 #title{
@@ -22,21 +22,6 @@ body {
   border-radius: 20px;
 }
 
-nav{
-  background: #284B63;
-  color: #fff;
-  display: flex;
-  justify-content: space-between;
-  padding: 10px;
-}
-
-ul{
-  display: flex;
-  list-style: none;
-  margin: 0px;
-  padding: 0px;
-}
-
 li{
   margin-right: 10px;
 }
@@ -44,22 +29,13 @@ li{
 a{
   color: #fff;
   text-decoration: none;
-  padding: 5px;
+  padding: 10px;
+  font-size: 17px;
 }
 
 a:hover{
-  background-color: #3C6E71;
+  color:rgb(40, 75, 99);
 }
-
-/* #loginDiv{
-  padding:25px;
-  margin: 0 auto;
-  text-align: center;
-  justify-content: flex-start;
-  width: 300px;
-  background-color: rgb(60, 110, 113,.9);
-  border-radius: 20px;
-} */
 
 #registerDiv{
   padding:25px;

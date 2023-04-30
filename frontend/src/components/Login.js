@@ -103,7 +103,6 @@ function Login()
         <div class="container">
             <div class="loginDiv">
                 <form onSubmit={doLogin}>
-                {/* <span id="inner-title">PLEASE LOG IN</span><br /> */}
                 <input type="text" id="loginName" placeholder="Username" ref={(c) => loginName = c} /><br />
                 <input type="password" id="loginPassword" placeholder="Password" ref={(c) => loginPassword = c} /><br />
 
@@ -112,16 +111,26 @@ function Login()
                 </form>
                 <span id="loginResult">{message}</span><br />
             
-                <span className = "link register">
+                <div id = "registerPrompt">
                     <span style={{fontSize:15}}>
                         No account? Register
                     </span>
-                    <Link to='/RegisterPage'>
+                    <Link class="registerLink"to='/RegisterPage'>
                     <span style={{fontSize:15}}>
-                        &nbsp;here.
+                        here
                     </span>
                     </Link>
-                </span>
+                </div>
+
+                <div id="forgotPasswordPrompt">
+                    <span style={{fontSize:15}}>
+                        Forgot Password? Click
+                    </span>
+                    <span style={{fontSize:15}}>
+                        here
+                    </span>
+                </div>
+
             </div>
         </div>
       

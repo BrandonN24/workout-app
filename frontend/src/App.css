@@ -1,13 +1,16 @@
 body {
   font-family: 'Josefin Sans';
   background-color: #FFFAFB;
+  background-image: url("./components/images/background.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  overflow-x:hidden;
 }
 
 * {
   padding: 0px;
   margin: 0px;
   box-sizing: border-box;
-
 }
 
 ::-webkit-scrollbar {
