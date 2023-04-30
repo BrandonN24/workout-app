@@ -3,6 +3,12 @@ import { Link } from 'react-router-dom';
 import './../css/NavBar.css';
 
 const NavBar = () => {
+
+  const logout = async event =>
+  {
+    localStorage.clear();
+  }
+
   return (
       <nav>
         <ul>
@@ -18,7 +24,7 @@ const NavBar = () => {
           <Link class="linkBar" to="/StatsPage">
             Stats
           </Link>
-          <Link class="linkBar" to="/">
+          <Link class="linkBar" onClick={logout} to="/">
             Logout
             </Link>
         </ul>

@@ -3,7 +3,9 @@
     height: 300px;
     /* grid-template-rows: repeat(auto-fit, minmax(100px, 1fr)); */
     /* grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); */
+    justify-content: center;
     justify-items: center;
+    align-items: center;
     flex-direction: column;
     position: relative;
     top: 45px;

@@ -17,6 +17,8 @@ import HistoryPage from './pages/HistoryPage';
 import StatsPage from './pages/StatsPage';
 import ExerciseDetail from './pages/ExerciseDetail';
 import EmailVerificationPage from './pages/EmailVerificationPage';
+import NewPasswordPage from './pages/NewPasswordPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
 
 
 function App() {
@@ -32,6 +34,8 @@ function App() {
       <Route path="/StatsPage" index element={<StatsPage />} />
       <Route path="/exercise/:id" element={<ExerciseDetail />} />
       <Route path="/EmailVerificationPage" index element={<EmailVerificationPage />} />
+      <Route path="/ForgotPasswordPage" index element={<ForgotPasswordPage />} />
+      <Route path="/NewPasswordPage" index element={<NewPasswordPage />} />
       
     </Routes>
   </BrowserRouter>
