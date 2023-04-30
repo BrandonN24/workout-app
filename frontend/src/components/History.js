@@ -57,7 +57,7 @@ function History() {
 
   return (
     <div className="containerH">
-      <h1>Workout Calendar</h1>
+      <h1 id="title">Workout Calendar</h1>
       <Calendar
         onChange={handleDateChange}
         value={date}
@@ -70,13 +70,12 @@ function History() {
       {workouts.map(workout => (
         <li key={workout._id}>
           {workout.exercises && workout.exercises.map((exercise, index) => (
-            <div key={index}>
-              <p><strong>Exercise Name:</strong> {exercise.Name}</p>
-              <p><strong>Sets:</strong></p>
+            <div className="exerciseInfo" key={index}>
+              <p className="exerciseName" ><strong>Exercise Name</strong> <br></br> {exercise.Name} <br></br> Effort Level: {exercise.effort}</p>
               <ul>
                 {exercise.Sets && exercise.Sets.map((set, setIndex) => (
                   <li key={setIndex}>
-                    Set {setIndex + 1}:<br/>
+                    <strong>Set {setIndex + 1}:</strong><br/>
                     Reps: {set.reps}<br/>
                     Weight: {set.weight}
                   </li>

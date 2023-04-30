@@ -13,6 +13,7 @@ body {
 }
 
 #title{
+  position: relative;
   padding:25px;
   margin: 0 auto;
   text-align: center;
@@ -20,6 +21,7 @@ body {
   width: 300px;
   background-color: rgb(217, 217, 217,.9);
   border-radius: 20px;
+  top: 20px;
 }
 
 li{
@@ -38,12 +40,14 @@ a:hover{
 }
 
 #registerDiv{
+  position: relative;
+  top: 35px;
   padding:25px;
   margin: 0 auto;
   text-align: center;
   justify-content: flex-start;
-  width: 300px;
-  background-color: rgb(60, 110, 113,.9);
+  width: 340px;
+  background-color: rgb(60, 91, 113,.9);
   border-radius: 20px;
 }
 

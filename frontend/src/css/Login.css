@@ -5,6 +5,8 @@
     /* grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); */
     justify-items: center;
     flex-direction: column;
+    position: relative;
+    top: 45px;
 }
 
 .loginDiv{
@@ -24,6 +26,8 @@
     align-items: center;
     background-color: white;
     border-radius: 10px;
+    width: 183px;
+    left: 30px;
 }
 
 #loginPassword{
@@ -32,7 +36,8 @@
     align-items: center;
     background-color: white;
     border-radius: 10px;
-
+    width: 183px;
+    left: 30px;
 }
 
 #loginButton{

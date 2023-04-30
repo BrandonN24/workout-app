@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import './../css/HomeInfo.css';
 
 function HomeInfo()
 {
@@ -15,9 +16,9 @@ function HomeInfo()
     return (
         <div id="homeInfoDiv">
             <h1>Welcome Back {loginName}!</h1>
-            <p>Age: {ageVal}</p>
-            <p>Height: {heightVal}</p>
-            <p>Weight: {weightVal}</p>
+            <h8 id="personalInfo">Age: {ageVal}</h8>
+            <h8 id="personalInfo">Height: {heightVal} in</h8>
+            <h8 id="personalInfo">Weight: {weightVal} lbs</h8>
         </div>
 
 

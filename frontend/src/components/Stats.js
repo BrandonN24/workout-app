@@ -12,6 +12,7 @@ function Stats()
 
   // Create the data points table
   const [table, setTable] = useState([]);
+  const [searchPerformed, setSearchPerformed] = useState(false);
 
   const doSearch = async event =>
   {
@@ -93,6 +94,7 @@ function Stats()
       }
 
       setTable(newTable);
+      setSearchPerformed(true);
       return;
     }
     catch(e)
@@ -108,40 +110,44 @@ function Stats()
        <h1 id="title">Stats</h1>
       </div>
       
+      <div id="statContainer">
       <div class="searchbar">
         <form>
-            <input type="text" id = "exerciseQuery" placeholder="search" ref={(c) => exerciseQuery = c}/>
+            <input type="text" id = "exerciseQuery" placeholder="Exercise" ref={(c) => exerciseQuery = c}/>
             <input type="button" id="searchButton" onClick ={doSearch} value = 'Search'/>
             <span id="searchResult"></span>
         </form>
       </div>
 
-      <h2>Highest Weight for Exercise by Date</h2> 
-
-      <div className="container">
-        <div className="table"> 
-          <table> 
-            <thead> 
-              <tr><th>Date</th> <th>Highest Weight</th></tr> 
-            </thead> 
-            <tbody>{table.map((row) => (<tr key={row.date}> <td>{row.date}</td> <td>{row.Weight}</td></tr>))}</tbody> 
-          </table> 
+      {table.length > 0 && (
+      <>
+        <h5>Highest Weight for Exercise by Date</h5> 
+        <div className="container">
+          <div className="table"> 
+            <table> 
+              <thead> 
+                <tr><th>Date</th> <th>Highest Weight</th></tr> 
+              </thead> 
+              <tbody>{table.map((row) => (<tr key={row.date}> <td>{row.date}</td> <td>{row.Weight} lbs</td></tr>))}</tbody> 
+            </table> 
+          </div>
+          <div className="graph">
+            <LineChart  width={600} height={350} data={table}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="Weight" stroke="#8884d8" />
+            </LineChart>
+          </div>
         </div>
-
-        <div className="graph">
-          <LineChart  width={600} height={350} data={table}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Line type="monotone" dataKey="Weight" stroke="#8884d8" />
-          </LineChart>
-        </div>
-      </div>
-    </>
-    
-   );
+      </>
+     
+    )}
+    </div>
+  </>
+);
 };
 
 export default Stats;

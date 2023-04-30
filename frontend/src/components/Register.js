@@ -1,4 +1,6 @@
 import React, {useState} from 'react';
+import './../css/Register.css';
+
 
 function Register()
 {
@@ -74,6 +76,7 @@ function Register()
 
 
     return (
+        <div id="registerContainer">
         <div id="registerDiv">
             <form onSubmit={doRegister}>
             <span id="inner-title">PLEASE REGISTER</span><br />
@@ -87,6 +90,7 @@ function Register()
             onClick={doRegister} />
             </form>
             <span id="registerResult">{message}</span>
+        </div>
         </div>
     );    
 

@@ -1,14 +1,19 @@
+#statContainer{
+  position: relative;
+  top: 42px;
+}
+
 .searchbar {
     display: flex;
     justify-content: center;
     align-items: center;
   }
 
-  h2{
+  h5{
     display: flex;
     justify-content: center;
     align-items: center;
-    color: white
+    color: white;
   }
 
   .container {
@@ -27,7 +32,7 @@
 
   .table {
     display: flex;
-    justify-content: center;
+    justify-content: top;
     align-items: center;
     flex-direction: column;
     flex-basis: 50%;
