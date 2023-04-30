@@ -109,12 +109,14 @@ exports.setApp = function (app, client)
                 throw "Banned Name";
             } else {
                 await db.collection('userInfo').insertOne(newUser);
+                ret = {error: error};
             }
         } catch(e) {
             // set error message to error from DB if that point fails.
             error = e.toString();
             ret = {error: error};
             res.status(400).json(ret);
+            return;
         }
 
         res.status(200).json(ret);  // return with HTML code 200 and error message json
