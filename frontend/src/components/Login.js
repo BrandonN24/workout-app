@@ -127,9 +127,11 @@ function Login()
                     <span style={{fontSize:15}}>
                         Forgot Password? Click
                     </span>
+                    <Link class="forgotPasswordLink"to='/ForgotPasswordPage'>
                     <span style={{fontSize:15}}>
                         here
                     </span>
+                    </Link>
                 </div>
 
             </div>

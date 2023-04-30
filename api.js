@@ -426,10 +426,11 @@ exports.setApp = function (app, client)
     //sendEmail tokenless API
     //Endpoint to initiate the email verification process
     app.post('/api/sendEmailTokenless', async (req, res) => {
-        // incoming: email, jwtToken
-        // outgoing: message, refreshedToken
+        // incoming: email
+        // outgoing: message
 
         // error codes:
+        // 200 - normal operation
         // 400 - bad request
         // 500 - email send error
 
@@ -1545,45 +1546,44 @@ exports.setApp = function (app, client)
 	
     //findUser API
     //finds a user with a given login and email
-    app.post('/api/findUser', async(req, res, next) => {		
-	// incoming: login, email
-	// outgoing: boolean for whether the user exists
+    app.post('/api/findUser', async(req, res, next) => 
+    {		
+        // incoming: login, email
+        // outgoing: boolean for whether the user exists
 
         // error codes;
         // 200 - normal operation
-	// 404 - user not found
+        // 404 - user not found
         // 400 - DB call failure
-		
+            
         const {login, email} = req.body;
-		
-	error = '';
-	let ret = {};
+            
+        error = '';
+        let ret = {};
 
         const db = client.db("LargeProject");
-	const user = db.collection('userInfo').find({login:login,email:email}).toArray();
-	try
-	{
-	    if(user.length > 0)
-	    {
-		ret = {exists:true,error:error};
-		res.status(200).json(ret);
-	    }
-	    else
-	    {
-		error = "User not found";
-		ret = {exists:false,error:error};
-		res.status(404).json(ret);
-	    }
+        const user = await db.collection('userInfo').find({login:login,email:email}).toArray();
+        try
+        {
+            if(user.length > 0)
+            {
+                ret = {exists:true,error:error};
+                res.status(200).json(ret);
+            }
+            else
+            {
+                error = "User not found";
+                ret = {exists:false,error:error};
+                res.status(404).json(ret);
+            }
         }
-	catch(e)
-	{
-	    error = e.toString();
-	    ret = {exists:false,error:error};
-	    res.status(400).json(ret);
-	}
-		
-	res.status(200).json(ret);
-		
+        catch(e)
+        {
+            error = e.toString();
+            ret = {exists:false,error:error};
+            res.status(400).json(ret);
+        }
+            
     });
     // *****************
     // END OF FINDUSER API
@@ -1601,40 +1601,41 @@ exports.setApp = function (app, client)
     // 401 - Invalid verification code
 		
     var error = '';
-    const {email, vcode} = req.body;
+    const {email, vCode} = req.body;
 		
     let ret = {};
 
     const db = client.db("LargeProject");
-    const user = db.find({email:email}).toArray();
+    const user = await db.collection('userInfo').find({email:email}).toArray();
 		
     try
     {
         if(user.length > 0)
-	{
-	    if(user[0].vcode === vcode)
 	    {
-		ret = {newPass:true,error:error}
+            if(user[0].vCode === vCode)
+            {
+                await db.collection('userInfo').updateOne({email: email}, {$set: {newPass : true}});
+                ret = {newPass:true,error:error}
+            }
+            else 
+                await db.collection('userInfo').updateOne({email: email}, {$set: {newPass : false}});
+
+	        res.status(200).json(ret);
 	    }
-	    res.status(200).json(ret);
-	}
-	else
-	{
+	    else
+        {
             error = "User not found";
-	    ret = {newPass:false,error:error};
-	    res.status(404).json(ret);
-	}
-			
+            ret = {newPass:false,error:error};
+            res.status(404).json(ret);
         }
+			
+    }
 	catch(e)
 	{
-            error = e.toString();
+        error = e.toString();
 	    ret = {newPass:false,error:error}
-            res.status(400).json(ret);
-        }
-
-        ret = {password:newPass,error:error};
-	res.status(200).json(ret);
+        res.status(400).json(ret);
+    }
 		
     });
     // *****************
@@ -1642,60 +1643,63 @@ exports.setApp = function (app, client)
     // *****************
 	
 	//changePassword API
-        //after verifying the password change (previous API), this one carries out the change
-	app.post('/api/changePassword', async(req, res, next) => {
+    //after verifying the password change (previous API), this one carries out the change
+	app.post('/api/changePassword', async(req, res, next) => 
+    {
 		// incoming: login, password
-		// outgoing: the new password (none if it isn't updated)
+		// outgoing: error
 
         // error codes;
         // 200 - normal operation
         // 400 - DB call failure
-	// 404 - User not found
-		
-	var error = '';
+        // 404 - User not found
+            
+        var error = '';
         const {login, password} = req.body;
-		
-	let ret = {};
+            
+        let ret = {};
 
         const db = client.db("LargeProject");
-	const user = db.find({login:login}).toArray();
-		
-	try
-	{
-	    if(user[0].length > 0)
-	    {
-		// User exists, check for whether their password can change
-		if(user[0].newPass)
-		{
-		    // Change their password
-		    await db.collection('userInfo').updateOne({"login" : login}, {$set: {password:password}});
-		    ret = {password:password,error:error};
-		    res.status(200).json(ret);
-		}
-		else
-		{
-		    // Password change has not been verified
-		    error = "No permission";
-		    ret = {password:'',error:error};
-		    res.status(200).json(ret);
-		}
-	    }
-	    else
-	    {
-		error = "User not found";
-		ret = {password:'',error:error};
-		res.status(404).json(ret);
-	    }
-	}
-	catch(e)
-	{
-	    error = e.toString();
-	    ret = {password:'',error:error};
-	    res.status(400).json(ret);
-	}
+        const user = await db.collection('userInfo').find({login:login}).toArray();
+            
+        try
+        {
+            if(user[0].length > 0)
+            {
+            // User exists, check for whether their password can change
+            if(user[0].newPass)
+            {
+                // Change their password
+                await db.collection('userInfo').updateOne({login : login}, {$set: {password:password}});
+                // update newPass flag to show that they no longer need to change their password
+                await db.collection('userInfo').updateOne({login: login}, {$set: {newPass : false}});
+                ret = {error:error};
+                res.status(200).json(ret);
+            }
+            else
+            {
+                // Password change has not been verified
+                error = "No permission";
+                ret = {error:error};
+                res.status(200).json(ret);
+            }
+            }
+            else
+            {
+            error = "User not found";
+            ret = {error:error};
+            res.status(404).json(ret);
+            }
+        }
+        catch(e)
+        {
+            error = e.toString();
+            ret = {error:error};
+            res.status(400).json(ret);
+        }
 		
 	});
 	// *****************
-        // END OF CHANGEPASSWORD API
-        // *****************
+    // END OF CHANGEPASSWORD API
+    // *****************
 }
