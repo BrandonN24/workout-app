@@ -1,0 +1,87 @@
+.registerContainer{
+    display: flex;
+    height: 300px;
+    /* grid-template-rows: repeat(auto-fit, minmax(100px, 1fr)); */
+    /* grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); */
+    justify-items: center;
+    flex-direction: column;
+    position: relative;
+    top: 45px;
+}
+
+.registerDiv{
+    /*grid-row: 1;
+    grid-area: 1 / 1 / 2 / 2; */
+    padding:25px;
+    margin: 0 auto;
+    text-align: center;
+    width: 300px;
+    background-color: rgb(60, 110, 113,.9);
+    border-radius: 20px;
+}
+
+#registerName{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    border-radius: 10px;
+    width: 183px;
+    left: 40px;
+}
+
+#registerEmail{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    border-radius: 10px;
+    width: 183px;
+    left: 40px;
+}
+
+#registerLogin{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    border-radius: 10px;
+    width: 183px;
+    left: 40px;
+}
+
+#registerPassword{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    border-radius: 10px;
+    width: 183px;
+    left: 40px;
+}
+
+#confirmPassword{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    border-radius: 10px;
+    width: 183px;
+    left: 40px;
+}
+
+#registerButton{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 150px;
+    background-color: rgb(158, 183, 184, 1);
+    border-radius: 10px;
+    left: 60px;
+    bottom: 10px;
+}
+
+#registerResult{
+    display: flex;
+    color: white;
+}

@@ -1,0 +1,30 @@
+nav{
+    background: #284B63;
+    color: #fff;
+    display: flex;
+    position: sticky;
+    top: 0px;
+    justify-content: space-between;
+    padding: 10px;
+    z-index: 1;
+}
+  
+ul{
+    display: flex;
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+}
+
+.linkBar{
+    color: white;
+    text-decoration: none;
+    padding: 10px;
+    font-size: 17px;
+}
+
+.linkBar:hover{
+    color: rgb(40, 75, 99);
+    background-color: rgb(158, 183, 184);
+    border-radius: 10px;
+}

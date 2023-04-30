@@ -1,0 +1,68 @@
+.loginContainer{
+    display: flex;
+    height: 300px;
+    /* grid-template-rows: repeat(auto-fit, minmax(100px, 1fr)); */
+    /* grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); */
+    justify-items: center;
+    flex-direction: column;
+    position: relative;
+    top: 45px;
+}
+
+.loginDiv{
+    /*grid-row: 1;
+    grid-area: 1 / 1 / 2 / 2; */
+    padding:25px;
+    margin: 0 auto;
+    text-align: center;
+    width: 300px;
+    background-color: rgb(60, 110, 113,.9);
+    border-radius: 20px;
+}
+
+#loginName{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    border-radius: 10px;
+    width: 183px;
+    left: 30px;
+}
+
+#loginPassword{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    border-radius: 10px;
+    width: 183px;
+    left: 30px;
+}
+
+#loginButton{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 150px;
+    background-color: rgb(158, 183, 184, 1);
+    border-radius: 10px;
+    left: 50px;
+    bottom: 10px;
+}
+
+#registerPrompt{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+
+.registerLink:hover{
+    color: rgb(207, 219, 220);
+}
+
+#loginResult{
+    display: flex;
+    color: white;
+}

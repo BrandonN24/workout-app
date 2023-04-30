@@ -1,6 +1,8 @@
 import React, {useState} from 'react';
 import {Link} from 'react-router-dom';
 import {useJwt, isExpired, decodeToken} from "react-jwt";
+import bootstrap from 'bootstrap';
+import './../css/Login.css';
 
 let cookieName = "";
 let cookieID = [];
@@ -15,7 +17,6 @@ function saveCookie()
 
 function Login()
 {
-
     var loginName;
     var loginPassword;
 
@@ -25,7 +26,11 @@ function Login()
     {
         event.preventDefault();
 
-        var obj = {login:loginName.value,password:loginPassword.value};
+        var obj = 
+        {
+            login:loginName.value,
+            password:loginPassword.value
+        };
         var js = JSON.stringify(obj);
 
         try
@@ -56,23 +61,34 @@ function Login()
                 // prepare json payload with user objectId and jwt token
                 let sendID = {id: decodedToken.id , jwtToken: storage.retrieveToken()};
                 let jsIdObj = JSON.stringify(sendID);
-
+                
                 // make a call to get userInfo
                 const infoRequest = await fetch(bp.buildPath('api/getUserInfo'),
                 {method:'POST',body:jsIdObj,headers:{'Content-Type': 'application/json'}});
 
                 // store JSON object from getUserInfo in userInfo variable
                 let userInfo = JSON.parse(await infoRequest.text());
+                userInfo.login = loginName.value;
                 localStorage.setItem('user_data', JSON.stringify(userInfo));
 
-                // if age is an invalid value, then send user to addInfoPage.
-                if(userInfo.age == -1)
+                // If user has not been email verified, then send them to the email verification page
+                if(!userInfo.validated)
                 {
-                    window.location.href = '/AddInfoPage';    
+                    window.location.href = '/EmailVerificationPage';
                 }
-                else{
-                    window.location.href = '/HomePage';
-                }    
+                // otherwise, user has been email verified
+                else
+                {
+                    // if age is an invalid value, then send user to addInfoPage.
+                    if(userInfo.age == -1)
+                    {
+                        window.location.href = '/AddInfoPage';    
+                    }
+                    else{
+                        window.location.href = '/HomePage';
+                    }   
+                }
+                 
             }
         }
         catch(e)
@@ -84,28 +100,41 @@ function Login()
 
 
     return(
-      <div id="loginDiv">
-        <form onSubmit={doLogin}>
-        <span id="inner-title">PLEASE LOG IN</span><br />
-        <input type="text" id="loginName" placeholder="Username" ref={(c) => loginName = c} /><br />
-        <input type="password" id="loginPassword" placeholder="Password" ref={(c) => loginPassword = c} /><br />
+        <div class="loginContainer">
+            <div class="loginDiv">
+                <form onSubmit={doLogin}>
+                <span id="inner-title">PLEASE LOGIN</span><br />
+                <input type="text" id="loginName" placeholder="Username" ref={(c) => loginName = c} /><br />
+                <input type="password" id="loginPassword" placeholder="Password" ref={(c) => loginPassword = c} /><br />
 
-        <input type="submit" id="loginButton" class="buttons" value = "Do It"
-          onClick={doLogin} />
-        </form>
-        <span id="loginResult">{message}</span><br />
-     
-        <span className = "link register">
-            <span style={{fontSize:15}}>
-                No account? Register
-            </span>
-            <Link to='/RegisterPage'>
-            <span style={{fontSize:15}}>
-                &nbsp;here.
-            </span>
-            </Link>
-        </span>
-     </div>
+                <input type="submit" id="loginButton" class="buttons" value = "Sign In"
+                onClick={doLogin} />
+                </form>
+                <span id="loginResult">{message}</span><br />
+            
+                <div id = "registerPrompt">
+                    <span style={{fontSize:15}}>
+                        No account? Register
+                    </span>
+                    <Link class="registerLink"to='/RegisterPage'>
+                    <span style={{fontSize:15}}>
+                        here
+                    </span>
+                    </Link>
+                </div>
+
+                <div id="forgotPasswordPrompt">
+                    <span style={{fontSize:15}}>
+                        Forgot Password? Click
+                    </span>
+                    <span style={{fontSize:15}}>
+                        here
+                    </span>
+                </div>
+
+            </div>
+        </div>
+      
     );
 };
 
