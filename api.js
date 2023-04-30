@@ -1407,8 +1407,25 @@ exports.setApp = function (app, client)
     //completeWorkout API
     //takes incoming exercises and sets and adds them to an existing workout
     app.post('/api/completeWorkout', async (req, res, next) => {
-        const { wName, login, exercises } = req.body;
+        const { wName, login, exercises, jwtToken } = req.body;
         //const { name, exercises } = workout;
+
+        try {
+            if( token.isExpired(jwtToken)) {
+                var r = {error:'The JWT is no longer valid', jwtToken: ''};
+                res.status(401).json(r);
+                return;
+            }
+        } catch(e) {
+            console.log(e.message);
+        }
+        // refresh the token if prev. token not expired
+        let refreshedToken = null;
+        try {
+            refreshedToken = token.refresh(jwtToken);
+        } catch(e) {
+            console.log(e.message);
+        }
 
         const db = client.db("LargeProject");
       
@@ -1438,7 +1455,7 @@ exports.setApp = function (app, client)
                 
                 await db.collection('workoutInfo').insertOne(workout);
 
-                ret = {workout: workout};
+                ret = {workout: workout, refreshedToken: refreshedToken};
                 res.status(200).json(ret);
                 /*const result = await db.collection('users').updateOne({ login: login }, {$push: {workouts: {name: name, date: new Date(date), exercises: exercises*/
             } else {
@@ -1450,7 +1467,7 @@ exports.setApp = function (app, client)
     } catch (e) {
         error = e.toString();
 
-        ret = {error: error};
+        ret = {error: error, refreshedToken: refreshedToken};
         res.status(404).json(ret);
     }
     });
