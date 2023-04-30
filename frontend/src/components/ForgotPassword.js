@@ -5,8 +5,9 @@ function ForgotPassword()
 {
     const [message, setMessage] = useState('');
 
-    let email; // this holds the email entered by the user
-    let login; // this holds the login entered by the user
+    const [email, setEmail]  = useState('');; // this holds the email entered by the user
+    const [login, setLogin]  = useState('');; // this holds the login entered by the user
+    const [vCodeString, setVCode] = useState(''); // this holds the verification code entered by the user
 
     // Create variable to hold verification code entered from user.
     let vCode;
@@ -48,6 +49,7 @@ function ForgotPassword()
             }
             else{
                 setMessage("User found!");
+                localStorage.setItem('user_data', login.value);
             }
         }
         catch(e){
@@ -104,9 +106,6 @@ function ForgotPassword()
     {
         event.preventDefault();
 
-        // store the verificationCode in a constant variable.
-        const vCodeString = vCode.value;
-
         if(email === "" || email === undefined)
             return;
 
@@ -114,11 +113,10 @@ function ForgotPassword()
         let temp =
         {
             email: email.value,
-            vCode: vCodeString
+            vCode: vCodeString.value
         };
 
         let js = JSON.stringify(temp);
-        console.log(js);
 
         try
         {    
@@ -152,8 +150,8 @@ function ForgotPassword()
         <>
             <div id="forgotPasswordInfo">
                 <form>
-                    <input type="text" id="forgotLoginBox" placeholder="Login" ref={(capture) => login = capture} /><br />
-                    <input type="text" id="forgotEmailBox" placeholder="Email" ref={(capture) => email = capture} /><br />
+                    <input type="text" id="forgotLoginBox" placeholder="Login" ref={(capture) => setLogin(capture)} /><br />
+                    <input type="text" id="forgotEmailBox" placeholder="Email" ref={(capture) => setEmail(capture)} /><br />
                 </form>
             </div>
             <div id="ForgotPasswordEmailDiv">
@@ -166,7 +164,7 @@ function ForgotPassword()
 
                 <form onSubmit={verifyPasswordChange}>
                     <span id="inner-title">Enter your verification code here</span><br />
-                    <input type="text" id="verifyCode" placeholder="Verification Code" ref={(c) => vCode = c}/><br />
+                    <input type="text" id="verifyCode" placeholder="Verification Code" ref={(c) => setVCode(c)}/><br />
                     <input type="submit" id="verifyPasswordChangeButton" class="buttons" value = "Verify" onClick={verifyPasswordChange} />
                 </form>
 

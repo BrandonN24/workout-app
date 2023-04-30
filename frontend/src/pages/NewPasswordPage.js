@@ -1,6 +1,6 @@
 import React from 'react';
 import PageTitle from '../components/PageTitle';
-//import ForgotPassword from '../components/ForgotPassword';
+import NewPassword from '../components/NewPassword.js';
 
 const NewPasswordPage = () =>
 {
@@ -8,7 +8,7 @@ const NewPasswordPage = () =>
     return(
       <div>
         <PageTitle />
-        
+        <NewPassword />
       </div>
     );
 };

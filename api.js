@@ -1666,31 +1666,31 @@ exports.setApp = function (app, client)
             
         try
         {
-            if(user[0].length > 0)
+            if(user.length > 0)
             {
-            // User exists, check for whether their password can change
-            if(user[0].newPass)
-            {
-                // Change their password
-                await db.collection('userInfo').updateOne({login : login}, {$set: {password:password}});
-                // update newPass flag to show that they no longer need to change their password
-                await db.collection('userInfo').updateOne({login: login}, {$set: {newPass : false}});
-                ret = {error:error};
-                res.status(200).json(ret);
+                // User exists, check for whether their password can change
+                if(user[0].newPass)
+                {
+                    // Change their password
+                    await db.collection('userInfo').updateOne({login : login}, {$set: {password:password}});
+                    // update newPass flag to show that they no longer need to change their password
+                    await db.collection('userInfo').updateOne({login: login}, {$set: {newPass : false}});
+                    ret = {error:error};
+                    res.status(200).json(ret);
+                }
+                else
+                {
+                    // Password change has not been verified
+                    error = "No permission";
+                    ret = {error:error};
+                    res.status(200).json(ret);
+                }
             }
             else
             {
-                // Password change has not been verified
-                error = "No permission";
+                error = "User not found";
                 ret = {error:error};
-                res.status(200).json(ret);
-            }
-            }
-            else
-            {
-            error = "User not found";
-            ret = {error:error};
-            res.status(404).json(ret);
+                res.status(404).json(ret);
             }
         }
         catch(e)
