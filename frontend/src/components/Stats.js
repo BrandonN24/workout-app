@@ -1,4 +1,6 @@
 import React, {useState} from 'react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import './../css/Stats.css';
 
 function Stats()
 {
@@ -83,7 +85,7 @@ function Stats()
         {
           dataPoint = {
             date: workout.dateDone,
-            maxWeight: maxWeight
+            Weight: maxWeight
           };
 
           newTable.push(dataPoint);
@@ -106,7 +108,7 @@ function Stats()
        <h1 id="title">Stats</h1>
       </div>
       
-      <div className="searchbar">
+      <div class="searchbar">
         <form>
             <input type="text" id = "exerciseQuery" placeholder="search" ref={(c) => exerciseQuery = c}/>
             <input type="button" id="searchButton" onClick ={doSearch} value = 'Search'/>
@@ -114,15 +116,28 @@ function Stats()
         </form>
       </div>
 
-      <div> 
-        <h2>Highest Weight for Exercise by Date
-        </h2> 
-        <table> 
-          <thead> 
-            <tr><th>Date</th> <th>Highest Weight</th></tr> 
-          </thead> 
-          <tbody>{table.map((row) => (<tr key={row.date}> <td>{row.date}</td> <td>{row.maxWeight}</td></tr>))}</tbody> 
-        </table> 
+      <h2>Highest Weight for Exercise by Date</h2> 
+
+      <div className="container">
+        <div className="table"> 
+          <table> 
+            <thead> 
+              <tr><th>Date</th> <th>Highest Weight</th></tr> 
+            </thead> 
+            <tbody>{table.map((row) => (<tr key={row.date}> <td>{row.date}</td> <td>{row.Weight}</td></tr>))}</tbody> 
+          </table> 
+        </div>
+
+        <div className="graph">
+          <LineChart  width={600} height={350} data={table}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="date" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Line type="monotone" dataKey="Weight" stroke="#8884d8" />
+          </LineChart>
+        </div>
       </div>
     </>
     
