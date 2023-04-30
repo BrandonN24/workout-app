@@ -1435,7 +1435,7 @@ exports.setApp = function (app, client)
 
         try {
           if (userExists.length > 0) {
-            const workoutExists = await db.collection('workoutInfo').find({name: wName}).toArray();
+            const workoutExists = await db.collection('workoutInfo').find({name: wName, public: login}).toArray();
 
             if (!(workoutExists.length > 0)) {
                 var date = new Date().toLocaleDateString('en-US');
