@@ -9,7 +9,7 @@ function VerifyEmail()
     const userID = JSON.parse(localStorage.getItem("user_data"));
 
     // Create variable to hold verification code entered from user.
-    let vCode;
+    const [vCode, setVCode] = useState('');
 
     // Function to send email containing code to user's email.
     const sendEmail = async event =>
@@ -62,14 +62,11 @@ function VerifyEmail()
         let storage = require('../tokenStorage.js');
         event.preventDefault();
 
-        // store the verificationCode in a constant variable.
-        const vCodeString = vCode.value;
-
         // create the JSON payload
         let temp =
         {
             email: userID.email,
-            verificationCode: vCodeString,
+            verificationCode: vCode.value,
             jwtToken: storage.retrieveToken()
         };
 
@@ -162,7 +159,7 @@ function VerifyEmail()
 
                 <form onSubmit={verifyEmail}>
                     <span id="inner-title">Enter your verification code here</span><br />
-                    <input type="text" id="verifyCode" placeholder="Verification Code" ref={(c) => vCode = c} onFocus=""/><br />
+                    <input type="text" id="verifyCode" placeholder="Verification Code" ref={(c) => setVCode(c)} onFocus=""/><br />
                     <input type="submit" id="verifyEmailButton" class="buttons" value = "Verify" onClick={verifyEmail} />
                 </form>
 
