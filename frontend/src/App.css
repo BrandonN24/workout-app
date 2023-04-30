@@ -2,8 +2,10 @@ body {
   font-family: 'Josefin Sans';
   background-color: #FFFAFB;
   background-image: url("./components/images/background.jpg");
-  background-size: cover;
   background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+  background-attachment: fixed;
   overflow-x:hidden;
 }
 
