@@ -112,24 +112,18 @@ function Login()
                 <span id="loginResult">{message}</span>
             
                 <div id = "registerPrompt">
-                    <span style={{fontSize:15}}>
-                        No account? Register
-                    </span>
                     <Link class="registerLink"to='/RegisterPage'>
                     <span style={{fontSize:15}}>
-                        here
+                        No account? Register here!
                     </span>
                     </Link>
                 </div>
 
                 <div id="forgotPasswordPrompt">
-                    <span style={{fontSize:15}}>
-                        Forgot Password? Click
-                    </span>
                     <Link class="forgotPasswordLink"to='/ForgotPasswordPage'>
-                    <span style={{fontSize:15}}>
-                        here
-                    </span>
+                        <span style={{fontSize:15}}>
+                            Forgot Password?
+                        </span>
                     </Link>
                 </div>
 
