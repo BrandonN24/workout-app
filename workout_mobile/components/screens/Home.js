@@ -72,13 +72,13 @@ const Home = ({navigation}) => {
           login: decodedToken.login,
           jwtToken: token,
         };
-        console.log(data);
+        //console.log(data);
         let jsonData = JSON.stringify(data);
         let parseData = JSON.parse(jsonData);
         const response = await client.post('/api/deleteWorkout', {
           ...parseData,
         });
-        console.log(response);
+        //console.log(response);
         await AsyncStorage.setItem(
           'token',
           response.data.refreshedToken.accessToken,

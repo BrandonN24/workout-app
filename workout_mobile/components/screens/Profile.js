@@ -40,7 +40,7 @@ const ProfileScreen = () => {
       <Text style={styles.title}>Welcome to your profile, {name}!</Text>
       <Text style={styles.subtitle}>Email: {email}</Text>
       <Text style={styles.subtitle}>Age: {age}</Text>
-      <Text style={styles.subtitle}>Height: {height} ft</Text>
+      <Text style={styles.subtitle}>Height: {height} in</Text>
       <Text style={styles.subtitle}>Weight: {weight} lb</Text>
       <View style={styles.buttonContainer}>
         <Button title="Sign Out" onPress={handleSignOut} color="#3C6E71" />

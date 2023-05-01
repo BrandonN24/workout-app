@@ -12,6 +12,9 @@ import ValidateEmail from './components/screens/ValidateEmail';
 import FinishWorkout from './components/screens/FinishWorkout';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import WorkoutDetails from './components/screens/WorkoutDetails';
+import ForgetPassword from './components/screens/ForgetPassword';
+import ChangePassword from './components/screens/ChangePassword';
+import PasswordCode from './components/screens/PasswordCode';
 
 const theme = {
   ...DefaultTheme,
@@ -115,6 +118,18 @@ const App = () => {
           <Stack.Screen
             name="WorkoutDetails"
             component={WorkoutDetails}
+            options={{headerShown: true}}></Stack.Screen>
+          <Stack.Screen
+            name="ForgetPassword"
+            component={ForgetPassword}
+            options={{headerShown: true}}></Stack.Screen>
+          <Stack.Screen
+            name="ChangePassword"
+            component={ChangePassword}
+            options={{headerShown: true}}></Stack.Screen>
+          <Stack.Screen
+            name="PasswordCode"
+            component={PasswordCode}
             options={{headerShown: true}}></Stack.Screen>
         </Stack.Navigator>
       )}

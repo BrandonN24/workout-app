@@ -10,9 +10,8 @@ import NavigateButton from '../NavigateButton';
 import client from '../../api/client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import jwt_decode from 'jwt-decode';
-import {parse} from 'dotenv';
 
-const Login = ({setLoggedInState}) => {
+const Login = () => {
   const initialValues = {
     login: '',
     password: '',
@@ -24,6 +23,9 @@ const Login = ({setLoggedInState}) => {
   };
   const navigateToHome = () => {
     navigation.navigate('HomeScreen');
+  };
+  const navigateToForget = () => {
+    navigation.navigate('ForgetPassword');
   };
   const validationSchema = yup.object({
     login: yup.string().trim().required('Username is missing!'),
@@ -98,11 +100,12 @@ const Login = ({setLoggedInState}) => {
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={handleLogin}>
-        <Text style={styles.title}>UCF Fitness</Text>
+        <Text style={styles.title}>UCFitness</Text>
         <AppInput name="login" placeholder="Username" />
         <AppInput secureTextEntry name="password" placeholder="Password" />
         <SubmitButton title="Log In" />
         <NavigateButton onPress={navigateToRegister} title="Register" />
+        <NavigateButton onPress={navigateToForget} title="Forgot Password" />
       </CustomFormik>
     </FormContainer>
   );

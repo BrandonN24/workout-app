@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Button,
+  ScrollView,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
@@ -55,7 +56,7 @@ const FinishWorkout = () => {
     try {
       let token = await AsyncStorage.getItem('token');
       const decodedToken = jwt_decode(token);
-      console.log(decodedToken);
+      //console.log(decodedToken);
 
       let wName = await AsyncStorage.getItem('workoutName');
 
@@ -68,16 +69,20 @@ const FinishWorkout = () => {
           public: decodedToken.login,
           Sets: sets[index].map(set => ({weight: set.weight, reps: set.reps})),
         })),
+        jwtToken: token,
       };
-
-      console.log(JSON.stringify(workoutData));
+      //console.log(JSON.stringify(workoutData));
       let sendWorkout = JSON.stringify(workoutData);
       let parseWorkout = JSON.parse(sendWorkout);
-      console.log(parseWorkout);
+      //console.log(parseWorkout);
       const response = await client.post('/api/completeWorkout', {
         ...parseWorkout,
       });
-      console.log('Workout added');
+      await AsyncStorage.setItem(
+        'token',
+        response.data.refreshedToken.accessToken,
+      );
+      //console.log('Workout added');
       navigation.navigate('Home');
     } catch (error) {
       console.log(error);
@@ -85,41 +90,43 @@ const FinishWorkout = () => {
   };
 
   return (
-    <View style={styles.container}>
-      {exerciseNames.map((name, exerciseIndex) => (
-        <View key={exerciseIndex} style={styles.exercise}>
-          <Text style={styles.exerciseName}>{name}</Text>
-          <Button title="Add set" onPress={() => addSet(exerciseIndex)} />
-          {sets[exerciseIndex] &&
-            sets[exerciseIndex].map((set, setIndex) => (
-              <View key={setIndex} style={styles.set}>
-                <Text style={styles.setNumber}>Set {setIndex + 1}</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Weight"
-                  keyboardType="numeric"
-                  value={set.weight}
-                  onChangeText={value =>
-                    updateSet(exerciseIndex, setIndex, 'weight', value)
-                  }
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Reps"
-                  keyboardType="numeric"
-                  value={set.reps}
-                  onChangeText={value =>
-                    updateSet(exerciseIndex, setIndex, 'reps', value)
-                  }
-                />
-              </View>
-            ))}
-        </View>
-      ))}
-      <TouchableOpacity style={styles.finishButton} onPress={finishWorkout}>
-        <Text style={styles.finishButtonText}>Finish workout</Text>
-      </TouchableOpacity>
-    </View>
+    <ScrollView contentContainerStyle={styles.scrollViewContainer}>
+      <View style={styles.container}>
+        {exerciseNames.map((name, exerciseIndex) => (
+          <View key={exerciseIndex} style={styles.exercise}>
+            <Text style={styles.exerciseName}>{name}</Text>
+            <Button title="Add set" onPress={() => addSet(exerciseIndex)} />
+            {sets[exerciseIndex] &&
+              sets[exerciseIndex].map((set, setIndex) => (
+                <View key={setIndex} style={styles.set}>
+                  <Text style={styles.setNumber}>Set {setIndex + 1}</Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Weight"
+                    keyboardType="numeric"
+                    value={set.weight}
+                    onChangeText={value =>
+                      updateSet(exerciseIndex, setIndex, 'weight', value)
+                    }
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Reps"
+                    keyboardType="numeric"
+                    value={set.reps}
+                    onChangeText={value =>
+                      updateSet(exerciseIndex, setIndex, 'reps', value)
+                    }
+                  />
+                </View>
+              ))}
+          </View>
+        ))}
+        <TouchableOpacity style={styles.finishButton} onPress={finishWorkout}>
+          <Text style={styles.finishButtonText}>Finish workout</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 };
 
@@ -164,6 +171,12 @@ const styles = StyleSheet.create({
   finishButtonText: {
     color: '#fff',
     fontSize: 18,
+  },
+  scrollViewContainer: {
+    flexGrow: 1, // allows the content to expand to fill the available space
+    // horizontally centers the content
+    paddingTop: 20, // adds some padding to the top of the content
+    paddingBottom: 20, // adds some padding to the bottom of the content
   },
 });
 

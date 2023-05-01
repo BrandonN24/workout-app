@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {ScrollView} from 'react-native-gesture-handler';
 
 const NewExercise = () => {
   const [exercises, setExercises] = useState(['']);
@@ -23,7 +24,7 @@ const NewExercise = () => {
   const handleStartWorkout = () => {
     // Send the exercises to the API endpoint using Express and MongoDB here
     const nonEmptyExercises = exercises.filter(exercise => exercise !== '');
-    console.log('Exercises:', nonEmptyExercises);
+    //console.log('Exercises:', nonEmptyExercises);
     AsyncStorage.setItem('exerciseNames', JSON.stringify(nonEmptyExercises));
     navigation.navigate('FinishWorkout');
   };
@@ -68,25 +69,28 @@ const NewExercise = () => {
           onBlur={handleSaveWorkoutName}
         />
       </View>
-      <View style={styles.table}>
-        {exercises.map((exercise, index) => (
-          <View style={styles.row} key={index}>
-            {editing && (
-              <TouchableOpacity
-                style={styles.deleteButton}
-                onPress={() => handleDelete(index)}>
-                <Text style={styles.deleteButtonText}>Delete</Text>
-              </TouchableOpacity>
-            )}
-            <TextInput
-              style={styles.input}
-              placeholder="Exercise name"
-              value={exercise}
-              onChangeText={text => handleExerciseChange(text, index)}
-            />
-          </View>
-        ))}
-      </View>
+      <ScrollView>
+        <View style={styles.table}>
+          {exercises.map((exercise, index) => (
+            <View style={styles.row} key={index}>
+              {editing && (
+                <TouchableOpacity
+                  style={styles.deleteButton}
+                  onPress={() => handleDelete(index)}>
+                  <Text style={styles.deleteButtonText}>Delete</Text>
+                </TouchableOpacity>
+              )}
+              <TextInput
+                style={styles.input}
+                placeholder="Exercise name"
+                value={exercise}
+                onChangeText={text => handleExerciseChange(text, index)}
+              />
+            </View>
+          ))}
+        </View>
+      </ScrollView>
+
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={handleAddExercise}>
           <Text style={styles.buttonText}>New Exercise</Text>
