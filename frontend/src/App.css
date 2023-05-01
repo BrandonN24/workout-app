@@ -38,7 +38,7 @@ body {
   transition: 0.3s all ease-in-out;
 }
 
-.right-arrow {
+.left-arrow {
   right: 140px;
 }
 
@@ -72,8 +72,8 @@ body {
   width: 400px;
   height: 445px;
   background: #fff;
-  border-top: 4px solid #FF2625;
-  border-bottom-left-radius: 20px;
+  border: 4px solid #3c5b71;
+  border-radius: 20px;
   text-decoration: none;
   display: flex;
   justify-content: space-between;
@@ -98,8 +98,8 @@ body {
 }
 
 .search-btn:hover {
-  color: #FF2625 !important;
-  border: 1px solid #FF2625 !important;
+  color: #284B63 !important;
+  border: 1px solid #284B63 !important;
 }
 
 .exercise-video {
