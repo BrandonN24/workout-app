@@ -3,6 +3,7 @@ import './../css/HomeInfo.css';
 
 function HomeInfo() {
   const [message, setMessage] = useState('');
+  const [messageTwo, setMessageTwo] = useState('');
   const [workouts, setWorkouts] = useState([]);
 
   const userID = JSON.parse(localStorage.getItem('user_data'));
@@ -55,6 +56,13 @@ function HomeInfo() {
   }, [userID.login, jwtToken]);
 
   const handleExerciseClick = (exerciseName) => {
+
+    if(exerciseName === ''){
+      setMessage('');
+      setMessageTwo('');
+      return;
+    }
+
     let maxWeight = 0;
     for (let workout of workouts) {
       if (workout.public !== userID.login) continue;
@@ -70,8 +78,10 @@ function HomeInfo() {
           }
         }
       }
-    }
-    setMessage(`Max weight for ${exerciseName}: ${maxWeight} lbs`);
+    } 
+
+    setMessage(`Max weight for ${exerciseName}:`);
+    setMessageTwo(`${maxWeight} lbs`);
   };
 
   const exerciseNames = workouts.reduce((acc, workout) => {
@@ -87,7 +97,8 @@ function HomeInfo() {
 
   return (
     <div id="homeInfoDiv">
-      <h1>Welcome Back {loginName}!</h1>
+      <h1>Welcome Back,</h1>
+      <h1>{loginName}!</h1>
       <h8 id="personalInfo">Age: {ageVal}</h8>
       <h8 id="personalInfo">Height: {heightVal} in</h8>
       <h8 id="personalInfo">Weight: {weightVal} lbs</h8>
@@ -104,6 +115,7 @@ function HomeInfo() {
         ))}
       </select>
       <h1 id="personalBest">{message}</h1>
+      <h1 id="personalBest">{messageTwo}</h1>
     </div>
   );
 }

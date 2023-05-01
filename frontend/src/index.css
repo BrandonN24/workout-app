@@ -4,12 +4,6 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* background-image: url("./components/images/background.jpg"); */
-  /* margin: 0 auto 100px;
-  background-size: cover;
-  background-repeat: no-repeat;
-  overflow-x:hidden;
-  padding-top: 0px; */
 }
 
 #title{
