@@ -82,7 +82,7 @@ function VerifyEmail()
 
             var res = JSON.parse(await response.text());
 
-            if( res.error !== undefined)
+            if( res.error !== "Validated")
             {
                 setMessage(res.error);
                 return;

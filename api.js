@@ -538,7 +538,7 @@ exports.setApp = function (app, client)
                     // Create the json payload
                     ret =
                     {
-                        message: "Validated",
+                        error: "Validated",
                         refreshedToken: refreshedToken
                     }
 
@@ -547,7 +547,7 @@ exports.setApp = function (app, client)
                     // create the json payload
                     ret =
                     {
-                        message: "Invalid Verification code",
+                        error: "Invalid Verification code",
                         refreshedToken: refreshedToken
                     }
                     // Return an error if the verification code is invalid
