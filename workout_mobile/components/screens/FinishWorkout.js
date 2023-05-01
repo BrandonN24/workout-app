@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
   },
   scrollViewContainer: {
     flexGrow: 1, // allows the content to expand to fill the available space
-    alignItems: 'center', // horizontally centers the content
+    // horizontally centers the content
     paddingTop: 20, // adds some padding to the top of the content
     paddingBottom: 20, // adds some padding to the bottom of the content
   },
