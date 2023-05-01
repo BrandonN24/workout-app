@@ -41,7 +41,7 @@ const ExerciseDetail = () => {
   if (!exerciseDetail) return <div>No Data</div>;
 
   return (
-    <Box sx={{ backgroundColor: 'white', opacity: 0.9 }}>
+    <Box sx={{ backgroundColor: 'white', opacity: 0.97 }}>
       <NavBar />
       <Detail exerciseDetail={exerciseDetail} />
       <ExerciseVideos exerciseVideos={exerciseVideos} name={exerciseDetail.name} />

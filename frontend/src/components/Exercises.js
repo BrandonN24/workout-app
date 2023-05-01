@@ -47,16 +47,17 @@ const Exercises = ({ exercises, setExercises, bodyPart }) => {
           <ExerciseCard key={idx} exercise={exercise} />
         ))}
       </Stack>
-      <Stack sx={{ mt: { lg: '114px', xs: '70px' } }} alignItems="center">
+      <Stack sx={{ mt: { lg: '114px', xs: '70px'} }} alignItems="center">
         {exercises.length > 9 && (
           <Pagination
-            color="standard"
+            color="primary"
             shape="rounded"
             defaultPage={1}
             count={Math.ceil(exercises.length / exercisesPerPage)}
             page={currentPage}
             onChange={paginate}
             size="large"
+            sx={{ borderRadius: '20px', paddingTop: '24px'}}
           />
         )}
       </Stack>
