@@ -66,14 +66,14 @@ function NewPassword()
                         New Password
                     </span>
                     <br/>
-                    <input type="text" id="newPassword" placeholder="New Password" ref={(capture) => setNewPassword(capture)} />
+                    <input type="password" id="newPassword" placeholder="New Password" ref={(capture) => setNewPassword(capture)} />
                 </div>
                 <div class="confirmPasswordDiv">
                     <span>
                         Confirm Password
                     </span>
                     <br/>
-                    <input type="text" id="confirmNewPassword" placeholder="Confirm Password" ref={(capture) => setConfirmPassword(capture)} />
+                    <input type="password" id="confirmNewPassword" placeholder="Confirm Password" ref={(capture) => setConfirmPassword(capture)} />
                 </div>
                 <div>
                     <span id="forgotPasswordResult">{message}</span>

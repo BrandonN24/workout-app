@@ -6,7 +6,8 @@ function Stats()
 {
   const userID = JSON.parse(localStorage.getItem("user_data"));
   let login = userID.login;
-  let jwtToken = userID.jwtToken.accessToken;
+  let storage = require('../tokenStorage.js');
+  let jwtToken = storage.retrieveToken();
 
   const [exerciseQuery, setExerciseQuery] = useState('');
 
