@@ -43,6 +43,12 @@ function Register()
             return;
         }
 
+        var passwordRegex = /^.{5,}$/; 
+        if (!passwordRegex.test(obj.password)) {
+          setMessage('Password must be at least 5 characters long');
+          return;
+        }
+
         delete obj.confirmPassword;
         var js = JSON.stringify(obj);
 

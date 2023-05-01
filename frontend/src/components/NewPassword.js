@@ -10,6 +10,18 @@ function NewPassword()
     const changePassword = async event =>
     {
         event.preventDefault();
+        
+        var passwordRegex = /^.{5,}$/; 
+        if (!passwordRegex.test(newPassword.value)) {
+          setMessage('Password must be at least 5 characters long');
+          return;
+        }
+
+        var passwordRegex = /^.{5,}$/; 
+        if (!passwordRegex.test(confirmPassword.value)) {
+          setMessage('Password must be at least 5 characters long');
+          return;
+        }
 
         if(newPassword.value !== confirmPassword.value)
         {
