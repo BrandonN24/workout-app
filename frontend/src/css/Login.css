@@ -16,8 +16,10 @@
     margin: 0 auto;
     text-align: center;
     width: 300px;
-    background-color: rgb(60, 110, 113,.9);
+    background-color: #3C5B71;
+    opacity: 0.9;
     border-radius: 20px;
+    color: white;
 }
 
 #loginName{
