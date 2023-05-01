@@ -9,9 +9,6 @@ function ForgotPassword()
     const [login, setLogin]  = useState('');; // this holds the login entered by the user
     const [vCodeString, setVCode] = useState(''); // this holds the verification code entered by the user
 
-    // Create variable to hold verification code entered from user.
-    let vCode;
-
     // Function to send email containing code to user's email.
     const sendEmail = async event =>
     {
@@ -148,28 +145,32 @@ function ForgotPassword()
 
     return (
         <>
-            <div id="forgotPasswordInfo">
+        <div class="forgotPasswordContainer">
+            <div class="forgotPasswordInfo">
                 <form>
-                    <input type="text" id="forgotLoginBox" placeholder="Login" ref={(capture) => setLogin(capture)} /><br />
-                    <input type="text" id="forgotEmailBox" placeholder="Email" ref={(capture) => setEmail(capture)} /><br />
+                    <span>Enter your login here:</span>
+                    <input type="text" id="forgotLoginBox" placeholder="Login" ref={(capture) => setLogin(capture)} /><br /><br/>
+                    <span>Enter your email here:</span>
+                    <input type="text" id="forgotEmailBox" placeholder="Email" ref={(capture) => setEmail(capture)} />
                 </form>
             </div>
-            <div id="ForgotPasswordEmailDiv">
+            <div class="ForgotPasswordEmailDiv">
                 <form onSubmit={sendEmail}>
-                    <span id="inner-title">Click to get verification code</span><br />
-                    <input type="button" id="sendEmailButton" class="buttons" value = "Send Code"
+                    <span id="inner-title">Click to send verification code</span><br />
+                    <input type="button" id="sendCodeButton" class="buttons" value = "Send Code"
                     onClick={sendEmail} />
-                    <span id="VerifyResult">{message}</span>
                 </form>
-
+                <br/>
                 <form onSubmit={verifyPasswordChange}>
-                    <span id="inner-title">Enter your verification code here</span><br />
+                    <span id="inner-title">Enter your verification code:</span><br />
                     <input type="text" id="verifyCode" placeholder="Verification Code" ref={(c) => setVCode(c)}/><br />
                     <input type="submit" id="verifyPasswordChangeButton" class="buttons" value = "Verify" onClick={verifyPasswordChange} />
+                    <br/><br/>
+                    <span id="VerifyResult">{message}</span>
                 </form>
-
-                
             </div>
+        </div>
+            
         </>
     );    
 

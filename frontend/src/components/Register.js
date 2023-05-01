@@ -6,11 +6,13 @@ function Register()
 {
     const [message, setMessage] = useState('');
 
-    var registerLogin;
-    var registerPassword;
-    var confirmPassword;
-    var registerName;
-    var registerEmail;
+    const [registerLogin, setRegisterLogin] = useState('');
+    const [registerPassword, setRegisterPassword] = useState('');
+    const [confirmPassword , setConfirmPassword] = useState('');
+    const [registerName, setRegisterName] = useState('');
+    const [registerEmail, setRegisterEmail] = useState('');
+
+
 
     const doRegister = async event =>
     {
@@ -30,14 +32,14 @@ function Register()
             obj[key] = value.trim();
 
             if (obj[key] === "") {
-                setMessage(`${key} is empty`);
+                setMessage(`${key} is empty!`);
                 return;
             }
         }
 
         if(obj.password !== obj.confirmPassword)
         {
-            setMessage('Please confirm password.');
+            setMessage('Passwords do not match!');
             return;
         }
 
@@ -62,7 +64,7 @@ function Register()
                 var user = {name:res.name,id:res.id}
                 localStorage.setItem('user_data', JSON.stringify(user));
 
-                setMessage('Welcome');
+                setMessage('');
                 window.location.href = '/';
             }
         }
@@ -79,12 +81,12 @@ function Register()
         <div id="registerContainer">
         <div id="registerDiv">
             <form onSubmit={doRegister}>
-            <span id="innner-title">PLEASE REGISTER</span><br />
-            <input type="text" id="registerName" placeholder="Name" ref={(c) => registerName = c} /><br />
-            <input type="text" id="registerEmail" placeholder="Email" ref={(c) => registerEmail = c} /><br />
-            <input type="text" id="registerLogin" placeholder="Username" ref={(c) => registerLogin = c} /><br />
-            <input type="password" id="registerPassword" placeholder="Password" ref={(c) => registerPassword = c} /><br />
-            <input type="password" id="confirmPassword" placeholder="Confirm Password" ref={(c) => confirmPassword = c} /><br />
+            <h2 id="registerTitle">Create Account</h2><span id="registerSpacing"/>
+            <input type="text" id="registerName" placeholder="Name" ref={(c) => setRegisterName(c)} /><span id="regBetwFldSpac" />
+            <input type="text" id="registerEmail" placeholder="Email" ref={(c) => setRegisterEmail(c)} /><span id="regBetwFldSpac" />
+            <input type="text" id="registerLogin" placeholder="Username" ref={(c) => setRegisterLogin(c)} /><span id="regBetwFldSpac" />
+            <input type="password" id="registerPassword" placeholder="Password" ref={(c) => setRegisterPassword(c)} /><span id="regBetwFldSpac" />
+            <input type="password" id="confirmPassword" placeholder="Confirm Password" ref={(c) => setConfirmPassword(c)} /><span id="regBetwFldSpac" />
 
             <input type="submit" id="registerButton" class="buttons" value = "Sign Up"
             onClick={doRegister} />

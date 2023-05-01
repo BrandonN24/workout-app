@@ -62,18 +62,6 @@ textarea {
   transition: background 0.2s, border-color 0.2s;
 }
 
-#loginButton:hover {
-  background: #D9D9D9;
-  color: #000000;
-  cursor:pointer;
-}
-
-#registerButton:hover {
-  background: #D9D9D9;
-  color: #000000;
-  cursor:pointer;
-}
-
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;

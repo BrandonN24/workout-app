@@ -9,12 +9,28 @@
     align-items: center;
   }
 
+  #exerciseQuery{
+    width: 250px;
+    border-radius: 7px;
+  }
+
+  #searchButton{
+    width: 75px;
+    background-color: rgb(158, 183, 184, 1);
+    border-radius: 10px;
+  }
+
+  #searchButton:hover{
+    background-color: #d9d9d9;
+  }
+
   h5{
     display: flex;
     justify-content: center;
     align-items: center;
     color: white;
     background-color: black;
+    padding: 5px;
   }
 
   .container {

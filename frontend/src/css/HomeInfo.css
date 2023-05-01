@@ -9,12 +9,13 @@
     margin: 0 auto; 
     border-radius: 10px;
     color: white;
+    opacity: 0.97;
 }
 
 #personalInfo{
     text-align: left;
     margin-left: 20px;
-    padding: 5px;;
+    padding: 5px;
   }
 
 #personalBest{
