@@ -62,6 +62,10 @@
     color: white;
 }
 
+.registerLink{
+    color: #9EB7B8;
+}
+
 .registerLink:hover{
     color: rgb(207, 219, 220);
 }
@@ -69,4 +73,12 @@
 #loginResult{
     display: flex;
     color: white;
+}
+
+.forgotPasswordLink{
+    color: #9EB7B8;
+}
+
+.forgotPasswordLink:hover{
+    color: rgb(207, 219, 220);
 }
