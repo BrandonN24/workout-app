@@ -61,6 +61,7 @@ function Stats()
         
         let maxWeight = 0;
         let update = false;
+        let effort = 0;
 
         // loop through each exercise in each workout
         for(let exercise of workout.exercises)
@@ -68,6 +69,7 @@ function Stats()
           // remove all spaces and send characters to lowercase, then compare the names
           if(exercise.Name.replaceAll(" ", "").toLowerCase() === exerciseQuery.value.replaceAll(" ", "").toLowerCase())
           {
+            effort = exercise.effort;
             update = true;
             // loop through each set in the exercise
             for(let set of exercise.Sets)
@@ -85,7 +87,8 @@ function Stats()
         {
           dataPoint = {
             date: workout.dateDone,
-            Weight: maxWeight
+            Weight: maxWeight,
+            effort: effort
           };
 
           newTable.push(dataPoint);
@@ -125,9 +128,9 @@ function Stats()
           <div className="table"> 
             <table> 
               <thead> 
-                <tr><th>Date</th> <th>Highest Weight</th></tr> 
+                <tr><th>Date</th> <th>Highest Weight</th> <th>Effort Level (1-10)</th></tr>
               </thead> 
-              <tbody>{table.map((row) => (<tr key={row.date}> <td>{row.date}</td> <td>{row.Weight} lbs</td></tr>))}</tbody> 
+              <tbody>{table.map((row) => (<tr key={row.date}> <td>{row.date}</td> <td>{row.Weight} lbs</td> <td>{row.effort}</td></tr>))}</tbody> 
             </table> 
           </div>
           <div className="graph">
@@ -137,7 +140,7 @@ function Stats()
               <YAxis />
               <Tooltip />
               <Legend />
-              <Line type="monotone" dataKey="Weight" stroke="#8884d8" />
+              <Line type="monotone" dataKey="Weight" stroke="#3C6E71" />
             </LineChart>
           </div>
         </div>
