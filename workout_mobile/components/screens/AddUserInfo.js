@@ -54,11 +54,11 @@ const AddUserInfo = () => {
         ...values,
         jwtToken: token,
       };
-      console.log(sendID);
+      //console.log(sendID);
       const {addInfo} = await client.post('/api/addUserInfo', {
         ...sendID,
       });
-      console.log(addInfo);
+      //console.log(addInfo);
       navigation.navigate('HomeScreen');
     } catch (error) {
       console.log(error);

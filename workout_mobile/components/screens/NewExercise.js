@@ -24,7 +24,7 @@ const NewExercise = () => {
   const handleStartWorkout = () => {
     // Send the exercises to the API endpoint using Express and MongoDB here
     const nonEmptyExercises = exercises.filter(exercise => exercise !== '');
-    console.log('Exercises:', nonEmptyExercises);
+    //console.log('Exercises:', nonEmptyExercises);
     AsyncStorage.setItem('exerciseNames', JSON.stringify(nonEmptyExercises));
     navigation.navigate('FinishWorkout');
   };

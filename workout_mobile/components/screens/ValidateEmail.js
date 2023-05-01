@@ -22,20 +22,20 @@ const ValidateEmail = ({email}) => {
     let token = await AsyncStorage.getItem('token');
     let data = await AsyncStorage.getItem('data');
     data = JSON.parse(data);
-    console.log(data.email);
+    //console.log(data.email);
     let email = data.email;
     let sendID = {
       email: email,
       verificationCode: verificationCode,
       jwtToken: token,
     };
-    console.log(sendID);
+    //console.log(sendID);
     let jsIdObj = JSON.stringify(sendID);
     const parsedIdObj = JSON.parse(jsIdObj);
     const sendEmail = await client.post('/api/verifyEmail', {
       ...parsedIdObj,
     });
-    console.log(sendEmail.data);
+    //console.log(sendEmail.data);
     await AsyncStorage.setItem(
       'token',
       sendEmail.data.refreshedToken.accessToken,

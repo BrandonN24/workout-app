@@ -56,7 +56,7 @@ const FinishWorkout = () => {
     try {
       let token = await AsyncStorage.getItem('token');
       const decodedToken = jwt_decode(token);
-      console.log(decodedToken);
+      //console.log(decodedToken);
 
       let wName = await AsyncStorage.getItem('workoutName');
 
@@ -74,7 +74,7 @@ const FinishWorkout = () => {
       console.log(JSON.stringify(workoutData));
       let sendWorkout = JSON.stringify(workoutData);
       let parseWorkout = JSON.parse(sendWorkout);
-      console.log(parseWorkout);
+      //console.log(parseWorkout);
       const response = await client.post('/api/completeWorkout', {
         ...parseWorkout,
       });
@@ -82,7 +82,7 @@ const FinishWorkout = () => {
         'token',
         response.data.refreshedToken.accessToken,
       );
-      console.log('Workout added');
+      //console.log('Workout added');
       navigation.navigate('Home');
     } catch (error) {
       console.log(error);
