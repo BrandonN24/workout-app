@@ -71,7 +71,7 @@ const FinishWorkout = () => {
         })),
         jwtToken: token,
       };
-      console.log(JSON.stringify(workoutData));
+      //console.log(JSON.stringify(workoutData));
       let sendWorkout = JSON.stringify(workoutData);
       let parseWorkout = JSON.parse(sendWorkout);
       //console.log(parseWorkout);
