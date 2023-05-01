@@ -17,8 +17,8 @@ function saveCookie()
 
 function Login()
 {
-    var loginName;
-    var loginPassword;
+    const [loginName, setLoginName] = useState('');
+    const [loginPassword, setLoginPassword] = useState('');
 
     const [message,setMessage] = useState('');
 
@@ -103,14 +103,13 @@ function Login()
         <div class="loginContainer">
             <div class="loginDiv">
                 <form onSubmit={doLogin}>
-                <span id="inner-title">PLEASE LOGIN</span><br />
-                <input type="text" id="loginName" placeholder="Username" ref={(c) => loginName = c} /><br />
-                <input type="password" id="loginPassword" placeholder="Password" ref={(c) => loginPassword = c} /><br />
+                <input type="text" id="loginName" placeholder="Username" ref={(c) => setLoginName(c)} /><br />
+                <input type="password" id="loginPassword" placeholder="Password" ref={(c) => setLoginPassword(c)} /><br />
 
                 <input type="submit" id="loginButton" class="buttons" value = "Sign In"
                 onClick={doLogin} />
                 </form>
-                <span id="loginResult">{message}</span><br />
+                <span id="loginResult">{message}</span>
             
                 <div id = "registerPrompt">
                     <span style={{fontSize:15}}>
@@ -127,9 +126,11 @@ function Login()
                     <span style={{fontSize:15}}>
                         Forgot Password? Click
                     </span>
+                    <Link class="forgotPasswordLink"to='/ForgotPasswordPage'>
                     <span style={{fontSize:15}}>
                         here
                     </span>
+                    </Link>
                 </div>
 
             </div>

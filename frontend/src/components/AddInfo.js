@@ -8,9 +8,9 @@ function AddInfo()
 
     const userID = JSON.parse(localStorage.getItem("user_data"));
 
-    var addAge;
-    var addHeight;
-    var addWeight;
+    const [addAge, setAddAge] = useState('');
+    const [addHeight, setAddHeight] = useState('');
+    const [addWeight, setAddWeight] = useState('');
 
     const doAddInfo = async event =>
     {
@@ -48,7 +48,15 @@ function AddInfo()
             }
             else
             {
-                var user = {login:userID.login,age:ageVal,height:heightVal,weight:weightVal,id:userID.id}
+                var user = 
+                {
+                    login:userID.login,
+                    age:ageVal,
+                    height:heightVal,
+                    weight:weightVal,
+                    id:userID.id,
+                    name:userID.name
+                };
                 localStorage.setItem('user_data', JSON.stringify(user));
                 
                 setMessage('Info Added');
@@ -67,10 +75,10 @@ function AddInfo()
     return (
         <div id="addInfoDiv">
             <form onSubmit={doAddInfo}>
-            <span id="inner-title">PLEASE ADD SOME INFO</span><br />
-            <input type="text" id="addAge" placeholder="Age" ref={(c) => addAge = c} /><br />
-            <input type="text" id="addHeight" placeholder="Height(in.)" ref={(c) => addHeight = c} /><br />
-            <input type="text" id="addWeight" placeholder="Weight(lbs.)" ref={(c) => addWeight = c} /><br />
+            <span id="inner-title">Enter your information:</span><br />
+            <input type="text" id="addAge" placeholder="Age" ref={(c) => setAddAge(c)} /><br />
+            <input type="text" id="addHeight" placeholder="Height(in.)" ref={(c) => setAddHeight(c)} /><br />
+            <input type="text" id="addWeight" placeholder="Weight(lbs.)" ref={(c) => setAddWeight(c)} /><br />
 
             <input type="submit" id="addInfoButton" class="buttons" value = "Add"
             onClick={doAddInfo} />

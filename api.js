@@ -109,12 +109,14 @@ exports.setApp = function (app, client)
                 throw "Banned Name";
             } else {
                 await db.collection('userInfo').insertOne(newUser);
+                ret = {error: error};
             }
         } catch(e) {
             // set error message to error from DB if that point fails.
             error = e.toString();
             ret = {error: error};
             res.status(400).json(ret);
+            return;
         }
 
         res.status(200).json(ret);  // return with HTML code 200 and error message json
@@ -421,6 +423,75 @@ exports.setApp = function (app, client)
     });
     // ********************************
     // END OF SENDMAIL API
+    // ********************************
+
+    //sendEmail tokenless API
+    //Endpoint to initiate the email verification process
+    app.post('/api/sendEmailTokenless', async (req, res) => {
+        // incoming: email
+        // outgoing: message
+
+        // error codes:
+        // 200 - normal operation
+        // 400 - bad request
+        // 500 - email send error
+
+        const { email } = req.body;
+
+        // Generate a verification code
+        const verificationCode = uuidv4();
+
+        let ret = {};
+
+        // Connect to the database and get the user object.
+		const db = client.db("LargeProject");
+
+        // Try to find and update a user given a login field and 
+        // update with the given age, height, and weight parameters.
+        try {
+            result = await db.collection('userInfo').updateOne({"email" : email}, {$set: {"vCode" : verificationCode}});
+        } catch(e) {
+            error = e.toString();
+            // return error code 400, bad request.
+            res.status(400).json({error: error});
+        }
+
+         // Send the verification code to the user's email address
+         transporter.sendMail({
+            from: 'workoutappgroup9@gmail.com',
+            to: req.body.email,
+            subject: 'Email Verification Code',
+            text: `Your email verification code is: ${verificationCode}`,
+        }, (error, info) => {
+            if (error) {
+                console.log(error);
+
+                // create json payload for outgoing
+                ret =
+                {
+                    message : "Error sending email",
+                }
+
+                res.status(500).json(ret);
+            } else {
+                console.log('Email sent: ' + info.response);
+
+                // Store the verification code in the database or cache
+                // associated with the user's email address for later verification
+
+                // create json payload for outgoing
+                ret =
+                {
+                    message : "Verification email sent",
+                }
+
+                // Return a success response to the client
+                res.status(200).json(ret);
+            }
+        });
+    });
+    // ********************************
+    // END OF SENDMAIL TOKENLESS API
     // ********************************
 
     // verifyEmail API
@@ -1407,8 +1478,25 @@ exports.setApp = function (app, client)
     //completeWorkout API
     //takes incoming exercises and sets and adds them to an existing workout
     app.post('/api/completeWorkout', async (req, res, next) => {
-        const { wName, login, exercises } = req.body;
+        const { wName, login, exercises, jwtToken } = req.body;
         //const { name, exercises } = workout;
+
+        try {
+            if( token.isExpired(jwtToken)) {
+                var r = {error:'The JWT is no longer valid', jwtToken: ''};
+                res.status(401).json(r);
+                return;
+            }
+        } catch(e) {
+            console.log(e.message);
+        }
+        // refresh the token if prev. token not expired
+        let refreshedToken = null;
+        try {
+            refreshedToken = token.refresh(jwtToken);
+        } catch(e) {
+            console.log(e.message);
+        }
 
         const db = client.db("LargeProject");
       
@@ -1418,7 +1506,7 @@ exports.setApp = function (app, client)
 
         try {
           if (userExists.length > 0) {
-            const workoutExists = await db.collection('workoutInfo').find({name: wName}).toArray();
+            const workoutExists = await db.collection('workoutInfo').find({name: wName, public: login}).toArray();
 
             if (!(workoutExists.length > 0)) {
                 var date = new Date().toLocaleDateString('en-US');
@@ -1438,7 +1526,7 @@ exports.setApp = function (app, client)
                 
                 await db.collection('workoutInfo').insertOne(workout);
 
-                ret = {workout: workout};
+                ret = {workout: workout, refreshedToken: refreshedToken};
                 res.status(200).json(ret);
                 /*const result = await db.collection('users').updateOne({ login: login }, {$push: {workouts: {name: name, date: new Date(date), exercises: exercises*/
             } else {
@@ -1450,7 +1538,7 @@ exports.setApp = function (app, client)
     } catch (e) {
         error = e.toString();
 
-        ret = {error: error};
+        ret = {error: error, refreshedToken: refreshedToken};
         res.status(404).json(ret);
     }
     });
@@ -1458,90 +1546,162 @@ exports.setApp = function (app, client)
     // END OF COMPLETEWORKOUT API
     // *****************
 	
-    //verifyPasswordChange API
-    //similar to verifyEmail but used for password change
-    app.post('/api/verifyPasswordChange', async(req, res, next) => {		
-	// incoming: login, email
-	// outgoing: verification status
+    //findUser API
+    //finds a user with a given login and email
+    app.post('/api/findUser', async(req, res, next) => 
+    {		
+        // incoming: login, email
+        // outgoing: boolean for whether the user exists
 
         // error codes;
         // 200 - normal operation
+        // 404 - user not found
         // 400 - DB call failure
-		
-	var error = '';
+            
         const {login, email} = req.body;
-		
-	let ret = {};
+            
+        error = '';
+        let ret = {};
 
         const db = client.db("LargeProject");
+        const user = await db.collection('userInfo').find({login:login,email:email}).toArray();
+        try
+        {
+            if(user.length > 0)
+            {
+                ret = {exists:true,error:error};
+                res.status(200).json(ret);
+            }
+            else
+            {
+                error = "User not found";
+                ret = {exists:false,error:error};
+                res.status(404).json(ret);
+            }
+        }
+        catch(e)
+        {
+            error = e.toString();
+            ret = {exists:false,error:error};
+            res.status(400).json(ret);
+        }
+            
+    });
+    // *****************
+    // END OF FINDUSER API
+    // *****************
+	
+    //verifyPasswordChange API
+    //after verifying the password change (previous API), this one carries out the change
+    app.post('/api/verifyPasswordChange', async(req, res, next) => {		
+    // incoming: email, vcode
+    // outgoing: newPass (whether or not they have the correct pw change code)
+
+    // error codes;
+    // 200 - normal operation
+    // 400 - DB call failure
+    // 401 - Invalid verification code
 		
-	const user = db.collection('userInfo').find({login:login}).toArray();
+    var error = '';
+    const {email, vCode} = req.body;
 		
-	const validated = false;
+    let ret = {};
+
+    const db = client.db("LargeProject");
+    const user = await db.collection('userInfo').find({email:email}).toArray();
 		
-	try
-	{
-	    if(user.length > 0)
+    try
+    {
+        if(user.length > 0)
 	    {
-		if(user[0].validated)
-		{
-		    validated = true;
-		}
-		else
-		{
-		    validated = false;
-		}
+            if(user[0].vCode === vCode)
+            {
+                await db.collection('userInfo').updateOne({email: email}, {$set: {newPass : true}});
+                ret = {newPass:true,error:error}
+            }
+            else 
+                await db.collection('userInfo').updateOne({email: email}, {$set: {newPass : false}});
+
+	        res.status(200).json(ret);
 	    }
 	    else
-	    {
-		throw "No Such User";
-	    }
-	}
+        {
+            error = "User not found";
+            ret = {newPass:false,error:error};
+            res.status(404).json(ret);
+        }
+			
+    }
 	catch(e)
 	{
-	    error = e.toString();
-	    ret = {validated:validated,error:error};
-	    res.status(400).json(ret);
-	}
+        error = e.toString();
+	    ret = {newPass:false,error:error}
+        res.status(400).json(ret);
+    }
 		
-	ret = {validated:validated,error:error};
-	res.status(200).json(ret);
-		
-	});
-	// *****************
-        // END OF VERIFYPASSWORDCHANGE API
-        // *****************
+    });
+    // *****************
+    // END OF VERIFYPASSWORDCHANGE API
+    // *****************
 	
 	//changePassword API
-        //after verifying the password change (previous API), this one carries out the change
-	app.post('/api/changePassword', async(req, res, next) => {		
-	// incoming: login, newPass
-	// outgoing: new password
+    //after verifying the password change (previous API), this one carries out the change
+	app.post('/api/changePassword', async(req, res, next) => 
+    {
+		// incoming: login, password
+		// outgoing: error
 
         // error codes;
         // 200 - normal operation
         // 400 - DB call failure
-		
-	var error = '';
-        const {login, newPass} = req.body;
-		
-	let ret = {};
+        // 404 - User not found
+            
+        var error = '';
+        const {login, password} = req.body;
+            
+        let ret = {};
 
         const db = client.db("LargeProject");
-		
-	try {
-            const result = await db.collection('userInfo').updateOne({"login" : login}, {$set: {"password" : newPass}});
-        } catch(e) {
-            error = e.toString();
-            // return error code 400, bad request.
-            res.status(400).json({error: error});
+        const user = await db.collection('userInfo').find({login:login}).toArray();
+            
+        try
+        {
+            if(user.length > 0)
+            {
+                // User exists, check for whether their password can change
+                if(user[0].newPass)
+                {
+                    // Change their password
+                    await db.collection('userInfo').updateOne({login : login}, {$set: {password:password}});
+                    // update newPass flag to show that they no longer need to change their password
+                    await db.collection('userInfo').updateOne({login: login}, {$set: {newPass : false}});
+                    ret = {error:error};
+                    res.status(200).json(ret);
+                }
+                else
+                {
+                    // Password change has not been verified
+                    error = "No permission";
+                    ret = {error:error};
+                    res.status(200).json(ret);
+                }
+            }
+            else
+            {
+                error = "User not found";
+                ret = {error:error};
+                res.status(404).json(ret);
+            }
         }
-
-	ret = {password:newPass,error:error};
-	res.status(200).json(ret);
+        catch(e)
+        {
+            error = e.toString();
+            ret = {error:error};
+            res.status(400).json(ret);
+        }
 		
 	});
 	// *****************
-        // END OF CHANGEPASSWORD API
-        // *****************
+    // END OF CHANGEPASSWORD API
+    // *****************
 }

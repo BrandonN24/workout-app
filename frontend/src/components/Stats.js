@@ -6,9 +6,10 @@ function Stats()
 {
   const userID = JSON.parse(localStorage.getItem("user_data"));
   let login = userID.login;
-  let jwtToken = userID.jwtToken.accessToken;
+  let storage = require('../tokenStorage.js');
+  let jwtToken = storage.retrieveToken();
 
-  let exerciseQuery;
+  const [exerciseQuery, setExerciseQuery] = useState('');
 
   // Create the data points table
   const [table, setTable] = useState([]);
@@ -18,8 +19,6 @@ function Stats()
   {
     setTable([]);
     event.preventDefault();
-
-    let exerciseQuery = document.getElementById('exerciseQuery');
 
     let inPayload = {
       login: login,
@@ -113,7 +112,7 @@ function Stats()
       <div id="statContainer">
       <div class="searchbar">
         <form>
-            <input type="text" id = "exerciseQuery" placeholder="Exercise" ref={(c) => exerciseQuery = c}/>
+            <input type="text" id = "exerciseQuery" placeholder="Exercise" ref={(c) => setExerciseQuery(c)}/>
             <input type="button" id="searchButton" onClick ={doSearch} value = 'Search'/>
             <span id="searchResult"></span>
         </form>

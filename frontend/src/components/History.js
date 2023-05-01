@@ -28,13 +28,14 @@ function History() {
 
   const fetchWorkouts = async (date) => {
     try {
+      let storage = require('../tokenStorage.js');
       console.log('date is',date,'login is', userID.login);
 
       var obj = 
       {
         login: userID.login,
         date: date,
-        jwtToken: userID.jwtToken.accessToken
+        jwtToken: storage.retrieveToken()
       };
       var js = JSON.stringify(obj);
 
@@ -45,7 +46,6 @@ function History() {
       const data = await response.json();
       console.log(data);
 
-      let storage = require('../tokenStorage.js');
       storage.storeToken(data.refreshedToken);
 
       return {ok: response.ok, data};
