@@ -18,8 +18,10 @@
     margin: 0 auto;
     text-align: center;
     width: 300px;
-    background-color: rgb(60, 110, 113,.9);
+    background-color: #3C5B71;
+    opacity: 0.97;
     border-radius: 20px;
+    color: white;
 }
 
 #loginName{
@@ -27,7 +29,7 @@
     justify-content: center;
     align-items: center;
     background-color: white;
-    border-radius: 10px;
+    border-radius: 7px;
     width: 183px;
     left: 30px;
 }
@@ -37,7 +39,7 @@
     justify-content: center;
     align-items: center;
     background-color: white;
-    border-radius: 10px;
+    border-radius: 7px;
     width: 183px;
     left: 30px;
 }
@@ -53,11 +55,21 @@
     bottom: 10px;
 }
 
+#loginButton:hover {
+    background: #D9D9D9;
+    color: #000000;
+    cursor:pointer;
+}
+
 #registerPrompt{
     display: flex;
     justify-content: center;
     align-items: center;
     color: white;
+}
+
+.registerLink{
+    color: #9EB7B8;
 }
 
 .registerLink:hover{
@@ -67,4 +79,12 @@
 #loginResult{
     display: flex;
     color: white;
+}
+
+.forgotPasswordLink{
+    color: #9EB7B8;
+}
+
+.forgotPasswordLink:hover{
+    color: rgb(207, 219, 220);
 }

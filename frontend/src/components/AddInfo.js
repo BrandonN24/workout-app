@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {useJwt, isExpired, decodeToken} from "react-jwt";
+import './../css/AddInfo.css'
 
 function AddInfo()
 {

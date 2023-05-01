@@ -20,54 +20,14 @@
     border-radius: 20px;
 }
 
-#registerName{
+#registerName, #registerEmail, #registerLogin, #registerPassword, #confirmPassword{
     display: flex;
     justify-content: center;
     align-items: center;
     background-color: white;
-    border-radius: 10px;
+    border-radius: 7px;
     width: 183px;
-    left: 40px;
-}
-
-#registerEmail{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: white;
-    border-radius: 10px;
-    width: 183px;
-    left: 40px;
-}
-
-#registerLogin{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: white;
-    border-radius: 10px;
-    width: 183px;
-    left: 40px;
-}
-
-#registerPassword{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: white;
-    border-radius: 10px;
-    width: 183px;
-    left: 40px;
-}
-
-#confirmPassword{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: white;
-    border-radius: 10px;
-    width: 183px;
-    left: 40px;
+    left: 50px;
 }
 
 #registerButton{
@@ -77,11 +37,35 @@
     width: 150px;
     background-color: rgb(158, 183, 184, 1);
     border-radius: 10px;
-    left: 60px;
+    left: 70px;
     bottom: 10px;
+}
+
+#registerButton:hover {
+    background: #D9D9D9;
+    color: #000000;
+    cursor:pointer;
 }
 
 #registerResult{
     display: flex;
     color: white;
+    justify-content: center;
+    position: relative;
+    right: 10px;
+}
+
+#registerTitle{
+    color: white;
+    position: relative;
+}
+
+#registerSpacing{
+    display: block;
+    margin: 15px 0;
+}
+
+#regBetwFldSpac{
+    display: block;
+    margin: 25px 0;
 }

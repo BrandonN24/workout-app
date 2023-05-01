@@ -62,26 +62,21 @@ function NewPassword()
         <>
             <div class="newPasswordContainer">
                 <div class="newPasswordDiv">
-                    <span>
-                        New Password
-                    </span>
+                    <span>New Password:</span>
                     <br/>
-                    <input type="text" id="newPassword" placeholder="New Password" ref={(capture) => setNewPassword(capture)} />
+                    <input type="password" id="newPassword" placeholder="New Password" ref={(capture) => setNewPassword(capture)} />
                 </div>
                 <div class="confirmPasswordDiv">
-                    <span>
-                        Confirm Password
-                    </span>
+                    <span>Confirm Password:</span>
                     <br/>
-                    <input type="text" id="confirmNewPassword" placeholder="Confirm Password" ref={(capture) => setConfirmPassword(capture)} />
+                    <input type="password" id="confirmNewPassword" placeholder="Confirm Password" ref={(capture) => setConfirmPassword(capture)} />
                 </div>
-                <div>
-                    <span id="forgotPasswordResult">{message}</span>
-                    <br/>
+                <div class="changeButtonMessage">
                     <form onSubmit={changePassword}>
                         <input type="submit" id="changePasswordButton" class="buttons" value = "Change Password"
                         onClick={changePassword}/>
                     </form>
+                    <span id="forgotPasswordResult">{message}</span>
                 </div>
             </div>
             
